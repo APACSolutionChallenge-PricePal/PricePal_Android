@@ -1,4 +1,4 @@
-package com.example.start
+package com.example.pricepal.test.start
 
 import org.junit.Test
 

@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -9,7 +9,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 35
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -59,4 +59,9 @@ dependencies {
 
     // ✅ 시스템 바 투명 제어 (Splash용)
     implementation(libs.accompanist.systemuicontroller)
+
+    // 의존성 정의
+    implementation(project(":core"))
+    implementation(project(":design"))
+    //implementation(project(":data"))
 }
