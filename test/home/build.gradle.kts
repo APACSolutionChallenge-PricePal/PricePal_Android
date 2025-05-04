@@ -1,17 +1,20 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace = "com.example.home"
+    namespace = "com.example.pricepal.test.home"
     compileSdk = 35
 
     defaultConfig {
+        applicationId = "com.example.pricepal.test.home"
         minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {

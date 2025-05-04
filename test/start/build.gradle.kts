@@ -5,11 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.test.start"
+    namespace = "com.example.pricepal.test.start"
     compileSdk = 35
 
     defaultConfig {
+        applicationId = "com.example.pricepal.test.start"
         minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
