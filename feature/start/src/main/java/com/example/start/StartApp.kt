@@ -5,7 +5,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.start.navigation.StartNavHost
 
 @Composable
-fun StartApp() {
+fun StartApp(viewModel: StartViewModel) {
     val navController = rememberNavController()
-    StartNavHost(navController = navController)
+    StartNavHost(navController = navController, viewModel = viewModel)
 }

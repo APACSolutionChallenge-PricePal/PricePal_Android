@@ -19,7 +19,7 @@ class SplashActivity : ComponentActivity() {
             if (showSplash) {
                 SplashScreen(onTimeout = { showSplash = false })
             } else {
-                StartApp()
+                StartApp(viewModel = StartViewModel())
             }
         }
     }
