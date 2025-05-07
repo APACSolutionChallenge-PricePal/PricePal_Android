@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    // Hilt
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -34,9 +38,6 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
@@ -62,6 +63,13 @@ dependencies {
 
     // ✅ 시스템 바 투명 제어 (Splash용)
     implementation(libs.accompanist.systemuicontroller)
+    // coil 의존성 추가
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    // Hilt
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    // Jetpack Compose 쓰면 아래도
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // 의존성 정의
     implementation(project(":core"))

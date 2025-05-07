@@ -30,9 +30,9 @@ fun SplashScreen(onTimeout: () -> Unit) {
         systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = false)
     }
 
-    // 5초 후 StartScreenApp 으로 이동
+    // 2초 후 StartScreenApp 으로 이동
     LaunchedEffect(Unit) {
-        delay(5000)
+        delay(2000)
         onTimeout()
     }
 
