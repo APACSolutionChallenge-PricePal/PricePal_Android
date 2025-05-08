@@ -27,7 +27,11 @@ class StartViewModel : ViewModel() {
             Country("Korea", R.drawable.flag_kr),
             Country("Japan", R.drawable.flag_jp),
             Country("France", R.drawable.flag_fr),
-            Country("USA", R.drawable.flag_us)
+            Country("USA", R.drawable.flag_us),
+            Country("Germany", R.drawable.flag_de),
+            Country("Italy", R.drawable.flag_it),
+            Country("Canada", R.drawable.flag_ca),
+            Country("United Kingdom", R.drawable.flag_gb),
         )
     )
     val countryList: StateFlow<List<Country>> = _countryList

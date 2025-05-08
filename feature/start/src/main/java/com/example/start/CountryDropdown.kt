@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -109,37 +111,45 @@ fun CountryDropdown(
         ) {
             val sortedList = remember(countryList) { countryList.sortedBy { it.name } }
 
-            sortedList.forEach { country ->
-                DropdownMenuItem(
-                    onClick = {
-                        onCountrySelected(country)
-                        expanded = false
-                    },
-                    text = {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = Color.White)
-                                .padding(horizontal = 18.dp, vertical = 15.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Image(
-                                painter = painterResource(id = country.flagResId),
-                                contentDescription = "Flag of ${country.name}",
+            // ⚠️ LazyColumn 대신 Column + verticalScroll 사용
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 250.dp) // 드롭다운 최대 높이 제한
+                    .verticalScroll(rememberScrollState())
+            ) {
+                sortedList.forEach { country ->
+                    DropdownMenuItem(
+                        onClick = {
+                            onCountrySelected(country)
+                            expanded = false
+                        },
+                        text = {
+                            Row(
                                 modifier = Modifier
-                                    .width(44.dp)
-                                    .height(33.dp)
-                            )
-                            Spacer(modifier = Modifier.width(15.dp))
-                            Text(
-                                text = country.name,
-                                fontSize = 16.sp,
-                                color = mainText
-                            )
+                                    .fillMaxWidth()
+                                    .background(color = Color.White)
+                                    .padding(horizontal = 18.dp, vertical = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Image(
+                                    painter = painterResource(id = country.flagResId),
+                                    contentDescription = "Flag of ${country.name}",
+                                    modifier = Modifier
+                                        .width(44.dp)
+                                        .height(33.dp)
+                                )
+                                Spacer(modifier = Modifier.width(15.dp))
+                                Text(
+                                    text = country.name,
+                                    fontSize = 16.sp,
+                                    color = mainText
+                                )
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
+
         }
     }
 }
