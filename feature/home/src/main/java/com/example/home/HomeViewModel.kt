@@ -18,7 +18,7 @@ data class PriceItemData(
 
 class HomeViewModel : ViewModel() {
 
-    val exchangeRate = ExchangeRateData("KRW", "USD", 0.00068)
+    val exchangeRate = ExchangeRateData("KRW", "USD", 0.00012315368)
 
     val priceList = listOf(
         PriceItemData("A Bottle of Water", 800, "KRW", 0.54, "USD"),

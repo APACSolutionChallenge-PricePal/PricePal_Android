@@ -13,6 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +29,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.home.HomeViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import java.text.DecimalFormat
 
 val backgroundColor = Color(0xFFFCFAF4)
 val mainColor = Color(0xFF4CAE5E)
@@ -37,21 +40,40 @@ val highlight = Color(0xFF00611A)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
 
-    Column(
+    // 시스템 UI 색상 덮기
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setSystemBarsColor(color = backgroundColor)
+    }
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
+            .systemBarsPadding()
             .padding(horizontal = 25.dp, vertical = 8.dp)
     ) {
-        HeaderSection()
-        ExchangeRateSection(rate = viewModel.exchangeRate)
-        PriceListSection(priceList = viewModel.priceList)
+        item { HeaderSection() }
+        item { ExchangeRateSection(rate = viewModel.exchangeRate) }
+        item {
+            PriceTitleSection(priceList = viewModel.priceList) // "Prices" + Divider
+        }
+        items(viewModel.priceList) { item ->
+            PriceItem(
+                name = item.name,
+                localPrice = item.localPrice,
+                localCurrency = item.localCurrency,
+                convertedPrice = item.convertedPrice,
+                convertedCurrency = item.convertedCurrency
+            )
+        }
     }
 }
 
+
 @Composable
 fun HeaderSection() {
-    Spacer(modifier = Modifier.height(50.dp))
+    Spacer(modifier = Modifier.height(28.dp))
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -174,7 +196,9 @@ fun HeaderSection() {
 @Composable
 fun ExchangeRateSection(rate: ExchangeRateData) {
 
-    val rateText = "1 ${rate.fromCurrency} = ${rate.rate} ${rate.toCurrency}"
+    val formatter = DecimalFormat("0.######") // 최대 소수점 6자리까지
+    val formattedRate = formatter.format(rate.rate)
+    val rateText = "1 ${rate.fromCurrency} = $formattedRate ${rate.toCurrency}"
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -212,46 +236,28 @@ fun ExchangeRateSection(rate: ExchangeRateData) {
 }
 
 @Composable
-fun PriceListSection(priceList: List<PriceItemData>) {
-    Column {
-        Row(
+fun PriceTitleSection(priceList: List<PriceItemData>) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            "Prices",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = titleBlack
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        DashedDivider(
             modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Prices",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = titleBlack
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            DashedDivider(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(1.dp) // 얇은 선
-            )
-        }
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            items(priceList) { item ->
-                PriceItem(
-                    name = item.name,
-                    localPrice = item.localPrice,
-                    localCurrency = item.localCurrency,
-                    convertedPrice = item.convertedPrice,
-                    convertedCurrency = item.convertedCurrency
-                )
-            }
-        }
+                .weight(1f)
+                .height(1.dp) // 얇은 선
+        )
     }
+    Spacer(modifier = Modifier.height(30.dp))
 }
 
 @Composable
@@ -268,12 +274,12 @@ fun PriceItem(
     Box(
         modifier = Modifier
             .padding(bottom = 7.dp)
-            .border(2.dp, highlight, RoundedCornerShape(25.dp))
+            .border(2.dp, mainColor, RoundedCornerShape(25.dp))
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(25.dp),
-                ambientColor = highlight,
-                spotColor = highlight
+                ambientColor = mainColor,
+                spotColor = mainColor
             )
             .background(Color.White, shape = RoundedCornerShape(25.dp))
             .padding(horizontal = 22.dp, vertical = 17.dp)
@@ -298,10 +304,17 @@ fun PriceItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(name, fontWeight = FontWeight.SemiBold)
-                    Text(localText, fontSize = 12.sp, color = Color.Gray)
+                    Text(name, fontSize = 20.sp)
+                    Text(localText, fontSize = 16.sp, color = Color.Gray)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(convertedText, fontSize = 18.sp)
+                    }
                 }
-                Text(convertedText, fontWeight = FontWeight.Bold)
+
             }
 
         }
