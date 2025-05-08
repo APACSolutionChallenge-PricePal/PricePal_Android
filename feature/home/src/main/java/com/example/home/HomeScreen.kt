@@ -43,7 +43,11 @@ fun HomeScreen(viewModel: HomeViewModel) {
     // 시스템 UI 색상 덮기
     val systemUiController = rememberSystemUiController()
     SideEffect {
-        systemUiController.setSystemBarsColor(color = backgroundColor)
+        // 상태바 색상
+        systemUiController.setStatusBarColor(backgroundColor)
+
+        // 내비게이션 바 색상
+        systemUiController.setNavigationBarColor(Color.White)
     }
 
     LazyColumn(
