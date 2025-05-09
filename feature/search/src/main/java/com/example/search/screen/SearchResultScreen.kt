@@ -40,7 +40,8 @@ import com.example.search.SearchViewModel
 @Composable
 fun SearchResultScreen(viewModel: SearchViewModel = viewModel()) {
     val scrollState = rememberScrollState()
-    val searchKeyword = "Paddington Bear" // 예시로 고정된 키워드
+//    val searchKeyword = "Paddington Bear" // 예시로 고정된 키워드
+    val searchKeyword = viewModel.searchQuery.value // 🔄 ViewModel 값 사용
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -131,5 +132,8 @@ fun SearchResultScreen(viewModel: SearchViewModel = viewModel()) {
 @Preview(showBackground = true)
 @Composable
 fun SearchResultScreenPreview() {
-    SearchResultScreen()
+    val fakeViewModel = SearchViewModel().apply {
+        updateSearchQuery("Paddington Bear")
+    }
+    SearchResultScreen(viewModel = fakeViewModel)
 }
