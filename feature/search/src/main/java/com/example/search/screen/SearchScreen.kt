@@ -4,7 +4,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,10 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -36,20 +33,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.search.R
 import com.example.search.SearchViewModel
 import com.example.search.components.PriceItem
 import com.example.search.components.sampleItems
 
 @Composable
-fun SearchScreen(
-    viewModel: SearchViewModel = viewModel(),
-    navController: NavController
-) {
-    var localQuery by remember { mutableStateOf("") }
-
+fun SearchScreen(viewModel: SearchViewModel = viewModel()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,17 +52,8 @@ fun SearchScreen(
                 .fillMaxWidth()
                 .padding(top = 30.dp, start = 36.dp, end = 36.dp)
         ) {
-            Box(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                SearchBar(
-                    query = localQuery,
-                    onQueryChange = { localQuery = it },
-                    onSearch = {
-                        viewModel.updateSearchQuery(localQuery)
-                        navController.navigate("result")
-                    }
-                )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                SearchBar()
             }
         }
 
@@ -164,11 +145,9 @@ fun SearchScreen(
 }
 
 @Composable
-fun SearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    onSearch: () -> Unit
-) {
+fun SearchBar() {
+    val searchQuery = remember { mutableStateOf(TextFieldValue("")) }
+
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -181,7 +160,7 @@ fun SearchBar(
                 .background(Color(0xFFFFFFFF), RoundedCornerShape(20.dp))
                 .padding(horizontal = 24.dp)
         ) {
-            if (query.isEmpty()) {
+            if (searchQuery.value.text.isEmpty()) {
                 androidx.compose.material.Text(
                     text = "search ...",
                     color = Color(0xFFCACACA),
@@ -190,8 +169,8 @@ fun SearchBar(
             }
 
             BasicTextField(
-                value = TextFieldValue(query),
-                onValueChange = { onQueryChange(it.text) },
+                value = searchQuery.value,
+                onValueChange = { searchQuery.value = it },
                 textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
                 singleLine = true,
                 cursorBrush = SolidColor(Color.Black),
@@ -205,7 +184,6 @@ fun SearchBar(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(25.dp)
-                .clickable { onSearch() } // 클릭 시 검색
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_search),
@@ -219,6 +197,5 @@ fun SearchBar(
 @Preview(showBackground = true)
 @Composable
 fun SearchScreenPreview() {
-    val fakeNavController = rememberNavController()
-    SearchScreen(navController = fakeNavController)
+    SearchScreen()
 }
