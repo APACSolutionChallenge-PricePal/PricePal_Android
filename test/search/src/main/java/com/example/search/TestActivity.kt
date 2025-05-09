@@ -10,8 +10,7 @@ class TestActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val viewModel: SearchViewModel = viewModel()
-            SearchScreen(viewModel = viewModel)
+            SearchApp() // 전체 앱 내비게이션 및 화면 흐름 테스트 가능
         }
     }
 }
