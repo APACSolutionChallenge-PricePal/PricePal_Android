@@ -5,7 +5,7 @@
     <application
         android:name=".TestApplication"
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
-        android:label="Start Test App"
+        android:label="Home Test App"
         android:allowBackup="true"
         android:supportsRtl="true"
         tools:replace="android:label">
