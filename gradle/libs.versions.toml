@@ -14,8 +14,11 @@ ksp = "2.1.20-2.0.1"
 appcompat = "1.7.0"
 material = "1.12.0"
 jetbrainsKotlinJvm = "2.1.20"
+retrofit2 = "2.11.0"
+sharedPreference = "1.2.1"
 runtimeAndroid = "1.8.0"
 navigationCompose = "2.8.9"
+kotlinxCoroutines = "1.10.1"
 navigationComposeJvmstubs = "2.9.0"
 
 [libraries]
@@ -44,6 +47,11 @@ androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version = "0.32.0" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-navigation-compose-jvmstubs = { group = "androidx.navigation", name = "navigation-compose-jvmstubs", version.ref = "navigationComposeJvmstubs" }
+
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2" }
+retrofit2-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit2" }
+preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "sharedPreference" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
