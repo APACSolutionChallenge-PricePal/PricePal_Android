@@ -11,7 +11,7 @@ import com.example.start.StartApp
 import com.example.start.StartViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-//@AndroidEntryPoint
+@AndroidEntryPoint
 class TestActivity : ComponentActivity() {
 
     private val viewModel by viewModels<StartViewModel>()
@@ -21,13 +21,7 @@ class TestActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            var showSplash by remember { mutableStateOf(true) }
-
-            if (showSplash) {
-                SplashScreen(onTimeout = { showSplash = false })
-            } else {
-                StartApp(viewModel = viewModel)
-            }
+            StartApp(viewModel = viewModel)
         }
     }
 }

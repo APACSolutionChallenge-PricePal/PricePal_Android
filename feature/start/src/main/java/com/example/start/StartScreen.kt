@@ -27,12 +27,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.start.StartViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import com.example.core.model.Country
 
 @Composable
 fun StartScreen(
     //countryList: List<Country>,
-    viewModel: StartViewModel = StartViewModel(),
+    viewModel: StartViewModel,
     onGetStartedClick: (ownCountry: Country, travelCountry: Country) -> Unit
 ) {
 //    var ownCountry by remember { mutableStateOf(countryList.first()) }
@@ -41,6 +42,7 @@ fun StartScreen(
     val countryList by viewModel.countryList.collectAsState()
     val ownCountry by viewModel.ownCountry.collectAsState()
     val travelCountry by viewModel.travelCountry.collectAsState()
+    val isButtonEnabled = ownCountry != null && travelCountry != null
 
     val backgroundColor = Color(0xFFFCFAF4)
     val mainColor = Color(0xFF4CAE5E)
@@ -75,23 +77,27 @@ fun StartScreen(
             Spacer(modifier = Modifier.height(37.dp))
 
             Column {
-                CountryDropdown(
-                    label = "Your Own Country",
-                    selectedCountry = ownCountry,
-                    countryList = countryList,
-                    onCountrySelected = { viewModel.setOwnCountry(it) },
-                    borderColor = mainColor
-                )
+                ownCountry?.let {
+                    CountryDropdown(
+                        label = "Your Own Country",
+                        selectedCountry = it,
+                        countryList = countryList,
+                        onCountrySelected = { viewModel.setOwnCountry(it) },
+                        borderColor = mainColor
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(35.dp))
 
-                CountryDropdown(
-                    label = "Country to Travel",
-                    selectedCountry = travelCountry,
-                    countryList = countryList,
-                    onCountrySelected = { viewModel.setTravelCountry(it) },
-                    borderColor = mainColor
-                )
+                travelCountry?.let {
+                    CountryDropdown(
+                        label = "Country to Travel",
+                        selectedCountry = it,
+                        countryList = countryList,
+                        onCountrySelected = { viewModel.setTravelCountry(it) },
+                        borderColor = mainColor
+                    )
+                }
             }
         }
         // 하단 버튼
@@ -100,7 +106,12 @@ fun StartScreen(
                 .navigationBarsPadding()
         ) {
             Button(
-                onClick = { onGetStartedClick(ownCountry, travelCountry) },
+                onClick = {
+                    if (ownCountry != null && travelCountry != null) {
+                        onGetStartedClick(ownCountry!!, travelCountry!!)
+                    }
+                },
+                enabled = isButtonEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -115,16 +126,16 @@ fun StartScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun StartScreenPreview() {
-    val dummyViewModel = StartViewModel().apply {
-        setOwnCountry(Country("Korea", R.drawable.flag_kr))
-        setTravelCountry(Country("Japan", R.drawable.flag_jp))
-    }
-
-    StartScreen(
-        viewModel = dummyViewModel,
-        onGetStartedClick = { _, _ -> /* no-op for preview */ }
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun StartScreenPreview() {
+//    val dummyViewModel = StartViewModel().apply {
+//        setOwnCountry(Country("Korea", R.drawable.flag_kr))
+//        setTravelCountry(Country("Japan", R.drawable.flag_jp))
+//    }
+//
+//    StartScreen(
+//        viewModel = dummyViewModel,
+//        onGetStartedClick = { _, _ -> /* no-op for preview */ }
+//    )
+//}
