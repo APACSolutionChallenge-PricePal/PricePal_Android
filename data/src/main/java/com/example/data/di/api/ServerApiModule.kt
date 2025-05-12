@@ -2,6 +2,7 @@ package com.example.data.di.api
 
 import com.example.data.api.ServerApi
 import com.squareup.moshi.Moshi
+import com.example.data.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
