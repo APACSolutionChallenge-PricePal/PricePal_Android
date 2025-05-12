@@ -18,6 +18,7 @@ class CountryRepositoryImpl @Inject constructor(
 
         return response.map {
             Country(
+                countryName = it.countryName,
                 countryCode = it.countryCode,
                 downloadUrl = it.downloadUrl
             )

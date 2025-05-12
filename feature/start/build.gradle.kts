@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation)
 
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
     // 의존성 정의
     implementation(project(":core"))
     implementation(project(":design"))

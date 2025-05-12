@@ -62,6 +62,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // ✅ 시스템 바 투명 제어 (Splash용)
+    implementation(libs.accompanist.systemuicontroller)
+
     //의존성 정의
     implementation(project(":feature:start"))
     implementation(project(":feature:home"))
@@ -70,8 +73,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":data"))
     implementation(project(":design"))
-
-    implementation(project(":test:start"))
 
     // Hilt
     implementation(libs.hilt.android)
