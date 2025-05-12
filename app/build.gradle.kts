@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    // Hilt
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -10,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pricepal"
-        minSdk = 35
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -36,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -56,4 +61,22 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //의존성 정의
+    implementation(project(":feature:start"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:search"))
+    implementation(project(":feature:taxi"))
+    implementation(project(":core"))
+    implementation(project(":data"))
+    implementation(project(":design"))
+
+    implementation(project(":test:start"))
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.complier)
+    implementation(libs.androidx.hilt.navigation)
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 }
