@@ -1,5 +1,6 @@
 package com.example.data.implementation.repository
 
+import com.example.core.model.ExchangeRate
 import com.example.core.model.PriceItem
 import com.example.core.repository.PriceRepository
 import com.example.data.api.ServerApi
@@ -12,12 +13,16 @@ class PriceRepositoryImpl @Inject constructor(
     private val serverApi: ServerApi
 ) : PriceRepository {
 
-    override suspend fun getExchangeRate(base: String, target: String): Double {
+    override suspend fun getExchangeRate(base: String, target: String): ExchangeRate {
         val request = ExchangeRequestDTO(base = base, target = target)
         val response = serverApi.withCheck {
             getExchangeRate(request)
         }
-        return response
+        return ExchangeRate(
+            fromCurrency = base,
+            toCurrency = target,
+            rate = response
+        )
     }
 
     override suspend fun getPriceList(userCountry: String, travelCountry: String): List<PriceItem> {

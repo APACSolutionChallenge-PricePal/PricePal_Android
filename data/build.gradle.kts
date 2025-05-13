@@ -74,6 +74,9 @@ dependencies {
     ksp(libs.androidx.hilt.complier)
     implementation(libs.androidx.hilt.navigation)
 
+    implementation(libs.moshi)
+    ksp(libs.moshi.codegen)
+
     // Retrofit2
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.gson)
