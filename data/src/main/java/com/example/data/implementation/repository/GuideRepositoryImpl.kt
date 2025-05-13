@@ -1,5 +1,6 @@
 package com.example.data.implementation.repository
 
+import com.example.core.model.Guide
 import com.example.core.repository.GuideRepository
 import com.example.data.api.ServerApi
 import com.example.data.api.dto.server.GuideRequestDTO
@@ -10,10 +11,14 @@ class GuideRepositoryImpl @Inject constructor(
     private val serverApi: ServerApi
 ) : GuideRepository {
 
-    override suspend fun getPriceGuide(itemName: String, country: String): String {
-        val response = serverApi.withCheck {
+    override suspend fun getPriceGuide(itemName: String, country: String): Guide {
+        val result = serverApi.withCheck {
             getItemGuide(GuideRequestDTO(itemName = itemName, country = country))
         }
-        return response
+        return Guide(
+            itemName = itemName,
+            country = country,
+            content = result
+        )
     }
 }

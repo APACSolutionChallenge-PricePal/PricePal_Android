@@ -1,13 +1,14 @@
 package com.example.data.implementation.repository
 
 import com.example.core.model.Country
+import com.example.core.model.CountryDetail
 import com.example.core.repository.CountryRepository
 import com.example.data.api.ServerApi
 import com.example.data.api.withCheck
 import com.example.data.api.dto.server.CountryDetailRequestDTO
 import javax.inject.Inject
 
-class CountryRepositoryImpl @Inject constructor(
+class CountryRepositoryImpl(
     private val serverApi: ServerApi
 ) : CountryRepository {
 
@@ -25,10 +26,10 @@ class CountryRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCountryDetail(code: String): String {
+    override suspend fun getCountryDetail(code: String): CountryDetail {
         val response = serverApi.withCheck {
             getCountryDetail(CountryDetailRequestDTO(code))
         }
-        return response
+        return CountryDetail(info = response)
     }
 }
