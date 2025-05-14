@@ -1,5 +1,6 @@
 package com.example.core.model
 
 data class CountryDetail(
-    val info: String
+    val countryName: String,
+    val imageUrl: String
 )

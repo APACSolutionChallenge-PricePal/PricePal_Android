@@ -50,6 +50,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.gson)
 
     // ✅ Compose BOM (버전 통일 관리)
     implementation(platform(libs.androidx.compose.bom))
@@ -75,5 +76,6 @@ dependencies {
     // 의존성 정의
     implementation(project(":core"))
     implementation(project(":design"))
-    //implementation(project(":data"))
+    implementation(project(":data"))
+    implementation(project(":feature:home"))
 }

@@ -12,5 +12,5 @@ interface ExchangeApi {
     @POST("/exchange")
     suspend fun getExchangeRate(
         @Body request: ExchangeRequestDTO
-    ): BaseResponse<Double>
+    ): BaseResponse<String>
 }

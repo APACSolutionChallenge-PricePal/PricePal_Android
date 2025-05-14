@@ -1,7 +1,5 @@
 package com.example.core.model
 
 data class ExchangeRate(
-    val fromCurrency: String,
-    val toCurrency: String,
-    val rate: Double
+    val rateText: String // "1 USD = 147.856300 JPY"
 )

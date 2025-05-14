@@ -27,9 +27,21 @@ class CountryRepositoryImpl(
     }
 
     override suspend fun getCountryDetail(code: String): CountryDetail {
-        val response = serverApi.withCheck {
+        val raw = serverApi.withCheck {
             getCountryDetail(CountryDetailRequestDTO(code))
         }
-        return CountryDetail(info = response)
+
+        // 예: "[{download_url=..., country_eng_nm=...}]"
+        val urlRegex = "download_url=(.*?),".toRegex()
+        val nameRegex = "country_eng_nm=(.*?)\\]".toRegex()
+
+        val imageUrl = urlRegex.find(raw)?.groups?.get(1)?.value?.trim() ?: ""
+        val countryName = nameRegex.find(raw)?.groups?.get(1)?.value?.trim() ?: ""
+
+        return CountryDetail(
+            countryName = countryName,
+            imageUrl = imageUrl
+        )
     }
+
 }

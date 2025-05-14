@@ -13,7 +13,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +31,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.core.model.Country
+import com.example.core.model.CountryDetail
+import com.example.core.model.ExchangeRate
+import com.example.core.model.PriceItem
 import com.example.home.HomeViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.text.DecimalFormat
@@ -38,7 +45,16 @@ val titleBlack = Color(0xFF2A2E37)
 val highlight = Color(0xFF00611A)
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    ownCountry: Country,
+    travelCountry: Country
+) {
+    val countryDetail by viewModel.countryDetail.collectAsState()
+    val exchangeRate by viewModel.exchangeRate.collectAsState()
+    val priceList by viewModel.priceList.collectAsState()
+    val ownTimeZone by viewModel.ownTimeZone.collectAsState()
+    val travelTimeZone by viewModel.travelTimeZone.collectAsState()
 
     // 시스템 UI 색상 덮기
     val systemUiController = rememberSystemUiController()
@@ -50,6 +66,13 @@ fun HomeScreen(viewModel: HomeViewModel) {
         systemUiController.setNavigationBarColor(Color.White)
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadCountryDetail(travelCountry.countryCode)
+        viewModel.loadExchangeRate(ownCountry.countryName, travelCountry.countryName)
+        viewModel.loadPriceList(ownCountry.countryName, travelCountry.countryName)
+        viewModel.loadTimeZones(ownCountry.countryCode, travelCountry.countryCode)
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -57,18 +80,25 @@ fun HomeScreen(viewModel: HomeViewModel) {
             .systemBarsPadding()
             .padding(horizontal = 25.dp, vertical = 8.dp)
     ) {
-        item { HeaderSection() }
-        item { ExchangeRateSection(rate = viewModel.exchangeRate) }
         item {
-            PriceTitleSection(priceList = viewModel.priceList) // "Prices" + Divider
+            HeaderSection(
+                travelCountry = travelCountry,
+                ownCountry = ownCountry,
+                countryDetail = countryDetail,
+                ownTimeZone = ownTimeZone,
+                travelTimeZone = travelTimeZone
+            )
         }
-        items(viewModel.priceList) { item ->
+        item { exchangeRate?.let { ExchangeRateSection(rate = it) } }
+        item {
+            PriceTitleSection()
+        }
+        items(priceList) { item ->
             PriceItem(
-                name = item.name,
-                localPrice = item.localPrice,
-                localCurrency = item.localCurrency,
-                convertedPrice = item.convertedPrice,
-                convertedCurrency = item.convertedCurrency
+                name = item.itemName,
+                localPrice = item.userPrice,
+                convertedPrice = item.travelPrice,
+                imageUrl = item.imageUrl
             )
         }
     }
@@ -76,7 +106,13 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(
+    travelCountry: Country,
+    ownCountry: Country,
+    countryDetail: CountryDetail?,
+    ownTimeZone: String,
+    travelTimeZone: String
+) {
     Spacer(modifier = Modifier.height(28.dp))
 
     Column(
@@ -118,91 +154,109 @@ fun HeaderSection() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.flag_us),
-                contentDescription = "미국 국기",
-                modifier = Modifier
-                    .clip(RoundedCornerShape(15.dp))
-                    .height(84.dp)
-                    .width(112.dp),
-            )
+            if (countryDetail != null) {
+                coil3.compose.AsyncImage(
+                    model = countryDetail.imageUrl,
+                    contentDescription = "${countryDetail.countryName} 국기",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(15.dp))
+                        .height(84.dp)
+                        .width(112.dp)
+                )
+            }
             Spacer(modifier = Modifier.width(15.dp))
-            Text(
-                text = "South Korea",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = titleBlack,
-                maxLines = Int.MAX_VALUE,            // 제한 없이 줄 바꿈
-                overflow = TextOverflow.Visible      // 잘리지 않고 계속 보여줌
-            )
+            if (countryDetail != null) {
+                Text(
+                    text = countryDetail.countryName,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = titleBlack,
+                    maxLines = Int.MAX_VALUE,
+                    overflow = TextOverflow.Visible
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(22.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // 왼쪽
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp), // 시계와 간격 보장
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "U.S.A",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "(UTC-5)",
-                    fontSize = 14.sp
-                )
-            }
+        // 여행지 / 내 나라 정보 (시계 UI)
+        TimezoneRow(
+            ownCountry = ownCountry,
+            travelCountry = travelCountry,
+            ownTimeZone = ownTimeZone,          // 서버에서 받으면 교체 가능
+            travelTimeZone = travelTimeZone
+        )
 
-            // 시계 아이콘
-            Image(
-                painter = painterResource(id = R.drawable.ic_clock),
-                contentDescription = "시계 아이콘",
-                modifier = Modifier
-                    .size(24.dp)
-            )
 
-            // 오른쪽
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp), // 시계와 간격 보장
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "SOUTH KOREA",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "(UTC+9)",
-                    fontSize = 14.sp
-                )
-            }
-        }
         Spacer(modifier = Modifier.height(22.dp))
     }
 }
+@Composable
+fun TimezoneRow(
+    ownCountry: Country,
+    travelCountry: Country,
+    ownTimeZone: String,
+    travelTimeZone: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 왼쪽
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp), // 시계와 간격 보장
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = travelCountry.countryName.uppercase(),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "($travelTimeZone)",
+                fontSize = 14.sp
+            )
+        }
+
+        // 시계 아이콘
+        Image(
+            painter = painterResource(id = R.drawable.ic_clock),
+            contentDescription = "시계 아이콘",
+            modifier = Modifier
+                .size(24.dp)
+        )
+
+        // 오른쪽
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp), // 시계와 간격 보장
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = ownCountry.countryName.uppercase(),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "($ownTimeZone)",
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
 
 @Composable
-fun ExchangeRateSection(rate: ExchangeRateData) {
-
-    val formatter = DecimalFormat("0.######") // 최대 소수점 6자리까지
-    val formattedRate = formatter.format(rate.rate)
-    val rateText = "1 ${rate.fromCurrency} = $formattedRate ${rate.toCurrency}"
+fun ExchangeRateSection(rate: ExchangeRate) {
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -230,7 +284,7 @@ fun ExchangeRateSection(rate: ExchangeRateData) {
 
 
         Text(
-            text = rateText,
+            text = rate.rateText,
             fontSize = 32.sp,
             overflow = TextOverflow.Clip,
             softWrap = true
@@ -240,7 +294,7 @@ fun ExchangeRateSection(rate: ExchangeRateData) {
 }
 
 @Composable
-fun PriceTitleSection(priceList: List<PriceItemData>) {
+fun PriceTitleSection() {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -267,14 +321,10 @@ fun PriceTitleSection(priceList: List<PriceItemData>) {
 @Composable
 fun PriceItem(
     name: String,
-    localPrice: Int,
-    localCurrency: String,
-    convertedPrice: Double,
-    convertedCurrency: String
+    localPrice: String,
+    convertedPrice: String,
+    imageUrl: String
 ) {
-    val localText = "$localPrice $localCurrency"
-    val convertedText = String.format("%.2f %s", convertedPrice, convertedCurrency)
-
     Box(
         modifier = Modifier
             .padding(bottom = 7.dp)
@@ -293,9 +343,9 @@ fun PriceItem(
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_item),
-                contentDescription = "아이템 아이콘",
+            coil3.compose.AsyncImage(
+                model = imageUrl,
+                contentDescription = "$name 이미지",
                 modifier = Modifier
                     .size(75.dp)
                     .clip(CircleShape)
@@ -309,13 +359,13 @@ fun PriceItem(
             ) {
                 Column {
                     Text(name, fontSize = 20.sp)
-                    Text(localText, fontSize = 16.sp, color = Color.Gray)
+                    Text(localPrice, fontSize = 16.sp, color = Color.Gray)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(convertedText, fontSize = 18.sp)
+                        Text(convertedPrice, fontSize = 18.sp)
                     }
                 }
 
@@ -347,10 +397,10 @@ fun DashedDivider(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(
-        viewModel = HomeViewModel()
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenPreview() {
+//    HomeScreen(
+//        viewModel = HomeViewModel()
+//    )
+//}

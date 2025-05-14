@@ -14,15 +14,10 @@ class PriceRepositoryImpl @Inject constructor(
 ) : PriceRepository {
 
     override suspend fun getExchangeRate(base: String, target: String): ExchangeRate {
-        val request = ExchangeRequestDTO(base = base, target = target)
-        val response = serverApi.withCheck {
-            getExchangeRate(request)
+        val responseString = serverApi.withCheck {
+            getExchangeRate(ExchangeRequestDTO(base, target))
         }
-        return ExchangeRate(
-            fromCurrency = base,
-            toCurrency = target,
-            rate = response
-        )
+        return ExchangeRate(rateText = responseString)
     }
 
     override suspend fun getPriceList(userCountry: String, travelCountry: String): List<PriceItem> {

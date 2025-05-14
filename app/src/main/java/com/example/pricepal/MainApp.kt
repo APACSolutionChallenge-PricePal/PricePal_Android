@@ -12,11 +12,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.core.model.Country
 import com.example.home.HomeApp
+import com.example.home.HomeViewModel
 import com.example.start.StartApp
 import com.example.pricepal.component.NavigationBar
 import com.example.pricepal.component.NavigationItem
 import com.example.pricepal.SplashScreen
+import com.example.start.StartViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 
 @Composable
@@ -36,105 +40,117 @@ fun MainApp(viewModel: MainViewModel) {
     var showSplash by remember { mutableStateOf(true) }
     var currentNavigationItem by remember { mutableStateOf<NavigationItem?>(null) }
 
-    if (showSplash) {
-        SplashScreen {
-            showSplash = false
-            navController.navigate(NavigationItem.HOME) {
-                popUpTo(0)
-            }
+    // 네비게이션 변경될 때마다 현재 탭 업데이트
+    LaunchedEffect(currentRoute) {
+        currentNavigationItem = when (currentRoute) {
+            NavigationItem.HOME.toString() -> NavigationItem.HOME
+            NavigationItem.SEARCH.toString() -> NavigationItem.SEARCH
+            NavigationItem.MAP.toString() -> NavigationItem.MAP
+            else -> null
         }
-    } else {
-        MainScreen(
-            navigationBarProp = if (showBottomBar) NavigationBarProp(
-                currentNavigationItem = currentNavigationItem,
-                onNavigate = {
-                    if (it != currentNavigationItem) {
-                        currentNavigationItem = it
-                        navController.navigate(it) {
-                            popUpTo(navController.graph.startDestinationId) { inclusive = false }
-                            launchSingleTop = true
-                        }
+    }
+
+
+    MainScreen(
+        navigationBarProp = if (showBottomBar) NavigationBarProp(
+            currentNavigationItem = currentNavigationItem,
+            onNavigate = {
+                if (it != currentNavigationItem) {
+                    currentNavigationItem = it
+                    navController.navigate(it) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                        launchSingleTop = true
                     }
-                },
-            ) else null
+                }
+            },
+        ) else null
+    ) {
+        NavHost(
+            navController = navController,
+            startDestination = NavigationDestination.Splash.route,
+            modifier = Modifier.fillMaxSize()
         ) {
-            NavHost(
-                navController = navController,
-                startDestination = NavigationDestination.Splash,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                with(NavigationDestination.Splash) {
-                    setNavGraph {
-                        LaunchedEffect(Unit) { showNavBar = false }
-
-                        SplashScreen{}
-                    }
-                }
-
-                with(NavigationDestination.Home) {
-                    setNavGraph {
-                        LaunchedEffect(Unit) { showNavBar = false }
-                        FinishHandler()
-
-                        StartApp(
-                            viewModel = hiltViewModel()
-                        )
-                    }
-                }
-
-                with(NavigationDestination.Start) {
-                    setNavGraph {
-                        LaunchedEffect(Unit) { showNavBar = false }
-                        FinishHandler()
-
-                        StartApp(
-                            viewModel = hiltViewModel()
-                        )
-                    }
-                }
-
-                with(NavigationDestination.Home) {
-                    setNavGraph {
-                        //val homeViewModel = hiltViewModel()
-                        LaunchedEffect(Unit) {
-                            showNavBar = false
-                            //homeViewModel.fetchData()
+            with(NavigationDestination.Splash) {
+                setNavGraph {
+                    LaunchedEffect(Unit) {
+                        showNavBar = false
+                        delay(1500) // 1.5초 splash 대기
+                        navController.navigate(NavigationDestination.Start.route) {
+                            popUpTo(0)
                         }
-                        FinishHandler()
+                    }
 
-                        Column {
-                            Spacer(
-                                modifier = Modifier.height(
-                                    WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
-                                )
+                    SplashScreen()
+                }
+            }
+
+            with(NavigationDestination.Start) {
+                setNavGraph {
+                    val startViewModel: StartViewModel = hiltViewModel()
+                    LaunchedEffect(Unit) {
+                        showNavBar = false
+                        startViewModel.loadCountries()
+                    }
+                    FinishHandler()
+
+                    StartApp(
+                        startViewModel
+                    )
+                }
+            }
+
+            with(NavigationDestination.Home) {
+                setNavGraph {
+                    val homeViewModel: HomeViewModel = hiltViewModel()
+                    val gson = remember { Gson() }
+
+                    val ownCountryJson = it.arguments?.getString("ownCountry") ?: ""
+                    val travelCountryJson = it.arguments?.getString("travelCountry") ?: ""
+
+                    val ownCountry = remember { gson.fromJson(ownCountryJson, Country::class.java) }
+                    val travelCountry = remember { gson.fromJson(travelCountryJson, Country::class.java) }
+
+                    LaunchedEffect(Unit) { showNavBar = true }
+                    FinishHandler()
+
+                    Column {
+                        Spacer(
+                            modifier = Modifier.height(
+                                WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
                             )
-                            HomeApp()
-                        }
+                        )
+                        HomeApp(
+                            viewModel = homeViewModel,
+                            ownCountry = ownCountry,
+                            travelCountry = travelCountry
+                        )
                     }
                 }
+            }
 
-                with(NavigationDestination.Search) {
-                    setNavGraph {
-                        LaunchedEffect(Unit) { showNavBar = false }
-                        FinishHandler()
 
-                        // 추가 개발 필요
-                        //SearchApp()
-                    }
+            with(NavigationDestination.Search) {
+                setNavGraph {
+                    LaunchedEffect(Unit) { showNavBar = true }
+                    FinishHandler()
+
+                    // 추가 개발 필요
+                    //SearchApp()
                 }
+            }
 
-                with(NavigationDestination.Taxi) {
-                    setNavGraph {
-                        LaunchedEffect(Unit) { showNavBar = false }
-                        FinishHandler()
+            with(NavigationDestination.Taxi) {
+                setNavGraph {
+                    LaunchedEffect(Unit) { showNavBar = true }
+                    FinishHandler()
 
-                        // 추가 개발 필요
-                        //TaxiApp()
-                    }
+                    // 추가 개발 필요
+                    //TaxiApp()
                 }
             }
         }
     }
+
 }
 
 
