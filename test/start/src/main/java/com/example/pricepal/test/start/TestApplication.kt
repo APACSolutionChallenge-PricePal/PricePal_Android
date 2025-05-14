@@ -3,7 +3,7 @@ package com.example.pricepal.test.start
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
-@HiltAndroidApp
+//@HiltAndroidApp
 class TestApplication : Application() {
     override fun onCreate() {
         super.onCreate()

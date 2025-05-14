@@ -1,23 +1,16 @@
-package com.example.pricepal.test.start
+package com.example.start
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.runtime.*
 import androidx.core.view.WindowCompat
-import com.example.start.SplashScreen
-import com.example.start.StartApp
-import com.example.start.StartViewModel
-import dagger.hilt.android.AndroidEntryPoint
 
-//@AndroidEntryPoint
-class TestActivity : ComponentActivity() {
-
-    private val viewModel by viewModels<StartViewModel>()
-
+class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 상태바 영역까지 그릴 수 있도록 설정
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
@@ -26,7 +19,7 @@ class TestActivity : ComponentActivity() {
             if (showSplash) {
                 SplashScreen(onTimeout = { showSplash = false })
             } else {
-                StartApp(viewModel = viewModel)
+                StartApp(viewModel = StartViewModel())
             }
         }
     }

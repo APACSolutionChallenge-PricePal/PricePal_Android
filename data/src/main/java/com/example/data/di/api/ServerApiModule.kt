@@ -2,8 +2,6 @@ package com.example.data.di.api
 
 import com.example.data.api.ServerApi
 import com.squareup.moshi.Moshi
-import com.example.data.BuildConfig
-import com.squareup.moshi.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,11 +29,10 @@ object ServerApiModule {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVER_BASE_URL)
+            .baseUrl(BuildConfig.SERVER_BASE_URL) // TODO: 실제 서버 주소
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()
             .create(ServerApi::class.java)
     }
-
 }

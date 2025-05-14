@@ -9,8 +9,7 @@ interface ServerApi :
     PriceApi,
     BargainApi,
     GuideApi,
-    TaxiFareApi,
-    TimeZoneApi
+    TaxiFareApi
 
 suspend fun <T> ServerApi.withCheck(
     getter: suspend ServerApi.() -> BaseResponse<T>

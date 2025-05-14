@@ -2,46 +2,45 @@ package com.example.start
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.model.Country
-import com.example.core.repository.CountryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+//import com.example.core.model.Country
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class StartViewModel @Inject constructor(
-    private val countryRepository: CountryRepository
-) : ViewModel() {
 
-    private val _countryList = MutableStateFlow<List<Country>>(emptyList())
+// Country 모델 정의 (임시)
+data class Country(
+    val name: String,
+    val flagResId: Int
+    //val flagUrl: String
+)
+
+//@HiltViewModel
+//class StartViewModel @Inject constructor() : ViewModel() {
+class StartViewModel : ViewModel() {
+
+    val _countryList = MutableStateFlow<List<Country>>(
+        listOf(
+            Country("Korea", R.drawable.flag_kr),
+            Country("Japan", R.drawable.flag_jp),
+            Country("France", R.drawable.flag_fr),
+            Country("USA", R.drawable.flag_us),
+            Country("Germany", R.drawable.flag_de),
+            Country("Italy", R.drawable.flag_it),
+            Country("Canada", R.drawable.flag_ca),
+            Country("United Kingdom", R.drawable.flag_gb),
+        )
+    )
     val countryList: StateFlow<List<Country>> = _countryList
 
-    private val _ownCountry = MutableStateFlow<Country?>(null)
-    val ownCountry: StateFlow<Country?> = _ownCountry
+    val _ownCountry = MutableStateFlow(_countryList.value.first())
+    val ownCountry: StateFlow<Country> = _ownCountry
 
-    private val _travelCountry = MutableStateFlow<Country?>(null)
-    val travelCountry: StateFlow<Country?> = _travelCountry
-
-    init {
-        loadCountries()
-    }
-
-    fun loadCountries() {
-        viewModelScope.launch {
-            try {
-                val countries = countryRepository.getAllCountries()
-                android.util.Log.d("StartViewModel", "받아온 나라 수: ${countries.size}")
-                _countryList.value = countries
-                _ownCountry.value = countries.firstOrNull()
-                _travelCountry.value = countries.getOrNull(1) ?: countries.firstOrNull()
-            } catch (e: Exception) {
-                android.util.Log.e("StartViewModel", "나라 목록 로딩 실패: ${e.message}", e)
-            }
-        }
-    }
-
+    val _travelCountry = MutableStateFlow(_countryList.value.first())
+    val travelCountry: StateFlow<Country> = _travelCountry
 
     fun setOwnCountry(country: Country) {
         _ownCountry.value = country

@@ -36,7 +36,4 @@ dependencies {
 
     implementation(project(":design"))
     implementation(libs.androidx.runtime.android)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
 }

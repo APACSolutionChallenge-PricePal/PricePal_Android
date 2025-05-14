@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.example.core.model.Country
 
 @Composable
 fun CountryDropdown(
@@ -70,15 +69,12 @@ fun CountryDropdown(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ){
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(selectedCountry.downloadUrl)
-                            .crossfade(true)
-                            .build(),
+                    Image(
+                        painter = painterResource(id = selectedCountry.flagResId),
+                        contentDescription = "Flag of ${selectedCountry.name}",
                         modifier = Modifier
                             .width(44.dp)
-                            .height(33.dp),
-                        contentDescription = "Flag of ${selectedCountry.countryName}"
+                            .height(33.dp)
                     )
 //                AsyncImage(
 //                    model = ImageRequest.Builder(LocalContext.current)
@@ -92,7 +88,7 @@ fun CountryDropdown(
 //                )
                     Spacer(modifier = Modifier.width(15.dp))
                     Text(
-                        text = selectedCountry.countryName,
+                        text = selectedCountry.name,
                         fontSize = 16.sp,
                         color = mainText
                     )
@@ -113,7 +109,7 @@ fun CountryDropdown(
                 .width(with(LocalDensity.current) { dropdownWidth.toDp() }) // 정확히 맞춤
                 .background(Color.White),
         ) {
-            val sortedList = remember(countryList) { countryList.sortedBy { it.countryName } }
+            val sortedList = remember(countryList) { countryList.sortedBy { it.name } }
 
             // ⚠️ LazyColumn 대신 Column + verticalScroll 사용
             Column(
@@ -135,19 +131,16 @@ fun CountryDropdown(
                                     .padding(horizontal = 18.dp, vertical = 15.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(country.downloadUrl)
-                                        .crossfade(true)
-                                        .build(),
+                                Image(
+                                    painter = painterResource(id = country.flagResId),
+                                    contentDescription = "Flag of ${country.name}",
                                     modifier = Modifier
                                         .width(44.dp)
-                                        .height(33.dp),
-                                    contentDescription = "Flag of ${country.countryName}"
+                                        .height(33.dp)
                                 )
                                 Spacer(modifier = Modifier.width(15.dp))
                                 Text(
-                                    text = country.countryName,
+                                    text = country.name,
                                     fontSize = 16.sp,
                                     color = mainText
                                 )

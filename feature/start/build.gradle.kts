@@ -50,7 +50,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(libs.gson)
 
     // ✅ Compose BOM (버전 통일 관리)
     implementation(platform(libs.androidx.compose.bom))
@@ -71,11 +70,8 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation)
 
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-
     // 의존성 정의
     implementation(project(":core"))
     implementation(project(":design"))
-    implementation(project(":data"))
-    implementation(project(":feature:home"))
+    //implementation(project(":data"))
 }

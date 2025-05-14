@@ -9,10 +9,10 @@ import retrofit2.http.POST
 
 interface PriceApi {
 
-//    @POST("/exchange")
-//    suspend fun getExchangeRate(
-//        @Body request: ExchangeRequestDTO
-//    ): BaseResponse<String>
+    @POST("/exchange")
+    suspend fun getExchangeRate(
+        @Body request: ExchangeRequestDTO
+    ): BaseResponse<String>
 
     @POST("/prices")
     suspend fun getPriceList(
