@@ -15,5 +15,5 @@ interface CountryApi {
     @POST("/country/one")
     suspend fun getCountryDetail(
         @Body request: CountryDetailRequestDTO
-    ): BaseResponse<String>
+    ): BaseResponse<List<CountryItemDTO>>
 }
