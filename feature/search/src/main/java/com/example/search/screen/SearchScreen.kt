@@ -49,7 +49,7 @@ fun SearchScreen(
 ) {
     val tips by viewModel.tips.collectAsState()
     val summary by viewModel.summary.collectAsState()
-    var localQuery by remember { mutableStateOf("") }
+    var localQuery by remember { mutableStateOf(TextFieldValue("")) }
     val priceItems by viewModel.priceItemDataList.collectAsState()
 
     Column(
@@ -69,9 +69,11 @@ fun SearchScreen(
             ) {
                 SearchBar(
                     query = localQuery,
-                    onQueryChange = { localQuery = it },
+                    onQueryChange = {
+                        localQuery = it
+                    },
                     onSearch = {
-                        viewModel.updateSearchQuery(localQuery)
+                        viewModel.updateSearchQuery(localQuery.text)
                         navController.navigate("result")
                     }
                 )
@@ -185,8 +187,8 @@ fun SearchScreen(
 
 @Composable
 fun SearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
+    query: TextFieldValue,
+    onQueryChange: (TextFieldValue) -> Unit,
     onSearch: () -> Unit
 ) {
     Row(
@@ -201,7 +203,7 @@ fun SearchBar(
                 .background(Color(0xFFFFFFFF), RoundedCornerShape(20.dp))
                 .padding(horizontal = 24.dp)
         ) {
-            if (query.isEmpty()) {
+            if (query.text.isBlank()) {
                 androidx.compose.material.Text(
                     text = "search ...",
                     color = Color(0xFFCACACA),
@@ -210,8 +212,8 @@ fun SearchBar(
             }
 
             BasicTextField(
-                value = TextFieldValue(query),
-                onValueChange = { onQueryChange(it.text) },
+                value = query,
+                onValueChange = { onQueryChange(it) }, // 그대로 넘겨주기
                 textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
                 singleLine = true,
                 cursorBrush = SolidColor(Color.Black),
