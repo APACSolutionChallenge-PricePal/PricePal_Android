@@ -1,8 +1,9 @@
 package com.example.data.di.repository
 
-import com.example.core.repository.PriceRepository
+import com.example.core.repository.TimeZoneRepository
 import com.example.data.api.ServerApi
-import com.example.data.implementation.repository.PriceRepositoryImpl
+import com.example.data.api.TimeZoneApi
+import com.example.data.implementation.repository.TimeZoneRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,10 +12,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object PriceRepositoryModule {
+object TimeZoneRepositoryModule {
     @Provides
     @Singleton
-    fun providePriceRepository(
+    fun provideTimeZoneRepository(
         serverApi: ServerApi
-    ): PriceRepository = PriceRepositoryImpl(serverApi)
+    ): TimeZoneRepository = TimeZoneRepositoryImpl(serverApi)
 }

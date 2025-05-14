@@ -28,15 +28,16 @@ class StartViewModel @Inject constructor(
         loadCountries()
     }
 
-    private fun loadCountries() {
+    fun loadCountries() {
         viewModelScope.launch {
             try {
                 val countries = countryRepository.getAllCountries()
+                android.util.Log.d("StartViewModel", "받아온 나라 수: ${countries.size}")
                 _countryList.value = countries
                 _ownCountry.value = countries.firstOrNull()
                 _travelCountry.value = countries.getOrNull(1) ?: countries.firstOrNull()
             } catch (e: Exception) {
-                // 실패 처리 로그 또는 상태 업데이트 (필요 시)
+                android.util.Log.e("StartViewModel", "나라 목록 로딩 실패: ${e.message}", e)
             }
         }
     }

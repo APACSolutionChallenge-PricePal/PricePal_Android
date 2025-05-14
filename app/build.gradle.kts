@@ -62,6 +62,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(libs.gson)
+
+
     // ✅ 시스템 바 투명 제어 (Splash용)
     implementation(libs.accompanist.systemuicontroller)
 

@@ -1,6 +1,6 @@
 [versions]
 agp = "8.9.1"
-kotlin = "2.1.20"
+kotlin = "2.0.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -10,15 +10,16 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 hilt = "2.51.1"
 androidx-hilt = "1.2.0"
-ksp = "2.1.20-2.0.1"
+ksp = "2.0.0-1.0.21"
 appcompat = "1.7.0"
 material = "1.12.0"
-jetbrainsKotlinJvm = "2.1.20"
+jetbrainsKotlinJvm = "2.0.0"
 retrofit2 = "2.11.0"
 sharedPreference = "1.2.1"
 runtimeAndroid = "1.8.0"
 navigationCompose = "2.8.9"
 kotlinxCoroutines = "1.10.1"
+gson = "2.10.1"
 navigationComposeJvmstubs = "2.9.0"
 
 [libraries]
@@ -52,6 +53,8 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2" }
 retrofit2-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit2" }
 preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "sharedPreference" }
+
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 
 
 @Composable
-fun SplashScreen(onTimeout: () -> Unit) {
+fun SplashScreen() {
     val context = LocalContext.current
 
     // 상태바/내비바 색상 설정
@@ -30,11 +30,11 @@ fun SplashScreen(onTimeout: () -> Unit) {
         systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = false)
     }
 
-    // 2초 후 StartScreenApp 으로 이동
-    LaunchedEffect(Unit) {
-        delay(2000)
-        onTimeout()
-    }
+//    // 2초 후 StartScreenApp 으로 이동
+//    LaunchedEffect(Unit) {
+//        delay(2000)
+//        onTimeout()
+//    }
 
     // Radial Gradient 배경 + 중앙 로고
     Box(
@@ -64,5 +64,5 @@ fun SplashScreen(onTimeout: () -> Unit) {
 @Composable
 fun SplashScreenPreview() {
     // 실제 타이머 기능은 Preview에서 필요 없으니 빈 람다 전달
-    SplashScreen(onTimeout = {})
+    SplashScreen()
 }
