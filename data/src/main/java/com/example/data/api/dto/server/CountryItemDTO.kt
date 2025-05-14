@@ -5,7 +5,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CountryItemDTO(
-    @Json(name = "country_eng_nm") val countryName: String,
-    @Json(name = "country_iso_alp2") val countryCode: String,
-    @Json(name = "download_url") val downloadUrl: String
+    @Json(name = "countryEngNm") val countryName: String,
+    @Json(name = "countryIsoAlp2") val countryCode: String,
+    @Json(name = "downloadUrl") val downloadUrl: String
 )

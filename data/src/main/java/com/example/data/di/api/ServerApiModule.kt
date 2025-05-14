@@ -3,6 +3,7 @@ package com.example.data.di.api
 import com.example.data.api.ServerApi
 import com.squareup.moshi.Moshi
 import com.example.data.BuildConfig
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +21,7 @@ object ServerApiModule {
     @Provides
     @Singleton
     fun provideServerApi(): ServerApi {
-        val moshi = Moshi.Builder().build()
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val logger = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }

@@ -28,7 +28,7 @@ class CountryRepositoryImpl(
 
     override suspend fun getCountryDetail(code: String): CountryDetail {
         val response = serverApi.withCheck {
-            getCountryDetail(CountryDetailRequestDTO(code))
+            getCountryDetail(code)
         }
 
         val dto = response.firstOrNull()

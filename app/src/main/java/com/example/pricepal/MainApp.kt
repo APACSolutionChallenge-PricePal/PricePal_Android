@@ -29,42 +29,48 @@ fun MainApp(viewModel: MainViewModel) {
     val navController = rememberNavController()
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route
-    var showNavBar by remember { mutableStateOf(false) }
 
-    val showBottomBar = when (currentRoute) {
-        NavigationItem.HOME.toString(),
-        NavigationItem.MAP.toString(),
-        NavigationItem.SEARCH.toString() -> true
-        else -> false
-    }
 
-    var showSplash by remember { mutableStateOf(true) }
+    // ✅ 현재 화면이 네비게이션 바 대상인지 자동 판별
+    val showBottomBar = listOf(
+        NavigationDestination.Home.route,
+        NavigationDestination.Search.route,
+        NavigationDestination.Taxi.route
+    ).any { currentRoute?.startsWith(it) == true }
+
+    // ✅ 현재 선택된 탭 상태
     var currentNavigationItem by remember { mutableStateOf<NavigationItem?>(null) }
 
-    // 네비게이션 변경될 때마다 현재 탭 업데이트
+    // ✅ 현재 route에 따라 탭 하이라이트 업데이트
     LaunchedEffect(currentRoute) {
-        currentNavigationItem = when (currentRoute) {
-            NavigationItem.HOME.toString() -> NavigationItem.HOME
-            NavigationItem.SEARCH.toString() -> NavigationItem.SEARCH
-            NavigationItem.MAP.toString() -> NavigationItem.MAP
+        currentNavigationItem = when {
+            currentRoute?.startsWith(NavigationDestination.Home.route) == true -> NavigationItem.HOME
+            currentRoute?.startsWith(NavigationDestination.Search.route) == true -> NavigationItem.SEARCH
+            currentRoute?.startsWith(NavigationDestination.Taxi.route) == true -> NavigationItem.MAP
             else -> null
         }
     }
 
+    // ✅ 디버깅 로그 추가
+    println("🔥 currentRoute: $currentRoute")
+    println("✅ showBottomBar = ${listOf("home", "search", "taxi").any { currentRoute?.startsWith(it) == true }}")
+
 
     MainScreen(
-        navigationBarProp = if (showBottomBar) NavigationBarProp(
-            currentNavigationItem = currentNavigationItem,
-            onNavigate = {
-                if (it != currentNavigationItem) {
-                    currentNavigationItem = it
-                    navController.navigate(it) {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
-                        launchSingleTop = true
+        navigationBarProp = if (showBottomBar) {
+            NavigationBarProp(
+                currentNavigationItem = currentNavigationItem,
+                onNavigate = {
+                    if (it != currentNavigationItem) {
+                        currentNavigationItem = it
+                        navController.navigate(it.route) {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                            launchSingleTop = true
+                        }
                     }
                 }
-            },
-        ) else null
+            )
+        } else null
     ) {
         NavHost(
             navController = navController,
@@ -74,7 +80,6 @@ fun MainApp(viewModel: MainViewModel) {
             with(NavigationDestination.Splash) {
                 setNavGraph {
                     LaunchedEffect(Unit) {
-                        showNavBar = false
                         delay(1500) // 1.5초 splash 대기
                         navController.navigate(NavigationDestination.Start.route) {
                             popUpTo(0)
@@ -89,7 +94,6 @@ fun MainApp(viewModel: MainViewModel) {
                 setNavGraph {
                     val startViewModel: StartViewModel = hiltViewModel()
                     LaunchedEffect(Unit) {
-                        showNavBar = false
                         startViewModel.loadCountries()
                     }
                     FinishHandler()
@@ -111,7 +115,6 @@ fun MainApp(viewModel: MainViewModel) {
                     val ownCountry = remember { gson.fromJson(ownCountryJson, Country::class.java) }
                     val travelCountry = remember { gson.fromJson(travelCountryJson, Country::class.java) }
 
-                    LaunchedEffect(Unit) { showNavBar = true }
                     FinishHandler()
 
                     Column {
@@ -132,7 +135,7 @@ fun MainApp(viewModel: MainViewModel) {
 
             with(NavigationDestination.Search) {
                 setNavGraph {
-                    LaunchedEffect(Unit) { showNavBar = true }
+                    LaunchedEffect(Unit){}
                     FinishHandler()
 
                     // 추가 개발 필요
@@ -142,10 +145,10 @@ fun MainApp(viewModel: MainViewModel) {
 
             with(NavigationDestination.Taxi) {
                 setNavGraph {
-                    LaunchedEffect(Unit) { showNavBar = true }
+                    LaunchedEffect(Unit) {}
                     FinishHandler()
 
-                    TaxiApp()
+                    TaxiApp(hiltViewModel())
                 }
             }
         }

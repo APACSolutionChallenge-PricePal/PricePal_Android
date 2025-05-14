@@ -27,21 +27,25 @@ import androidx.compose.ui.unit.sp
 import com.example.pricepal.R
 
 enum class NavigationItem(
+    val route: String,
     @DrawableRes val icon: Int,
     val size: Size,
     val magnification: Float,
 ) {
     SEARCH(
+        route = "search",
         icon = R.drawable.ic_search,
         size = Size(25f, 25f),
         magnification = 1f,
     ),
     HOME(
+        route = "home",
         icon = R.drawable.ic_home,
         size = Size(25f, 25f),
         magnification = 1f,
     ),
     MAP(
+        route = "taxi",
         icon = R.drawable.ic_map,
         size = Size(25f, 25f),
         magnification = 1f,

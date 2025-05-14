@@ -30,7 +30,10 @@ fun TaxiScreen() {
     val systemUiController = rememberSystemUiController()
     SideEffect {
         // 상태바 색상
-        systemUiController.setStatusBarColor(backgroundColor)
+        systemUiController.setStatusBarColor(
+            color = Color.Transparent,
+            darkIcons = false
+        )
 
         // 내비게이션 바 색상
         systemUiController.setNavigationBarColor(Color.White)

@@ -1,5 +1,6 @@
 package com.example.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.CountryDetail
@@ -39,10 +40,21 @@ class HomeViewModel @Inject constructor(
 
     fun loadCountryDetail(code: String) {
         viewModelScope.launch {
-            val detail = countryRepository.getCountryDetail(code)
-            _countryDetail.value = detail
+            try {
+                val detail = countryRepository.getCountryDetail(code)
+                _countryDetail.value = detail
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error loading country detail", e)
+
+                // 임시 더미 데이터로 앱이 멈추지 않게 유지
+                _countryDetail.value = CountryDetail(
+                    countryName = "Korea",
+                    imageUrl = "https://opendata.mofa.go.kr:8444/fileDownload/images/country_images/flags/241/20220224_233513043.gif"
+                )
+            }
         }
     }
+
 
     fun loadExchangeRate(base: String, target: String) {
         viewModelScope.launch {
