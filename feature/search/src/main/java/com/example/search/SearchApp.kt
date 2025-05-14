@@ -43,6 +43,7 @@ fun SearchApp(startCountry: String) {
                 viewModel.updateSearchQuery(country)
                 hasInitialized.value = true
             }
+            viewModel.updateCountry(country) // ✅ 동적으로 국가 설정
             SearchScreen(viewModel = viewModel, navController = navController)
         }
 

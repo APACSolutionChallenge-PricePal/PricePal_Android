@@ -3,9 +3,11 @@ package com.example.search
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.model.Guide
 import com.example.core.model.PriceItem
 import com.example.core.model.Tip
 import com.example.core.repository.BargainRepository
+import com.example.core.repository.GuideRepository
 import com.example.core.repository.PriceRepository
 import com.example.search.model.PriceItemData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val bargainRepository: BargainRepository,
-    private val priceRepository: PriceRepository
+    private val priceRepository: PriceRepository,
+    private val guideRepository: GuideRepository
 ) : ViewModel() {
 
     var searchQuery = mutableStateOf("")
@@ -28,6 +31,13 @@ class SearchViewModel @Inject constructor(
 
     fun updateSearchQuery(newQuery: String) {
         searchQuery.value = newQuery
+    }
+
+    var country = mutableStateOf("korea") // ✅ 국가 상태 추가
+        private set
+
+    fun updateCountry(newCountry: String) {
+        country.value = newCountry
     }
 
     private val _tips = MutableStateFlow<List<Tip>>(emptyList())
@@ -38,6 +48,9 @@ class SearchViewModel @Inject constructor(
 
     private val _priceItems = MutableStateFlow<List<PriceItem>>(emptyList())
     val priceItems: StateFlow<List<PriceItem>> = _priceItems
+
+    private val _guide = MutableStateFlow<Guide?>(null)
+    val guide: StateFlow<Guide?> = _guide
 
     // ✅ 변환된 UI 모델을 제공하는 StateFlow
     val priceItemDataList: StateFlow<List<PriceItemData>> =
@@ -74,6 +87,16 @@ class SearchViewModel @Inject constructor(
                 _priceItems.value = priceRepository.getPriceList(userCountry, travelCountry)
             } catch (e: Exception) {
                 _priceItems.value = emptyList()
+            }
+        }
+    }
+
+    fun fetchGuide(itemName: String, country: String) {
+        viewModelScope.launch {
+            try {
+                _guide.value = guideRepository.getPriceGuide(itemName, country)
+            } catch (e: Exception) {
+                _guide.value = null
             }
         }
     }
