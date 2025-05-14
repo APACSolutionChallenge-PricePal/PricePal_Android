@@ -6,29 +6,40 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.example.search.R
+import com.example.search.model.PriceItemData
 
-data class PriceItemData(
-    val title: String,
-    val mycityPrice: String,
-    val tripPrice: String,
-    val imageRes: Int
-)
+//data class PriceItemData(
+//    val title: String,
+//    val mycityPrice: String,
+//    val tripPrice: String,
+//    val imageRes: Int
+//)
+//
+//val sampleItems = listOf(
+//    PriceItemData("A Bottle of Water", "0.54 USD", "800 KRW", R.drawable.ic_bottle_blue),
+//    PriceItemData("A Cup of Coffee", "2.80 USD", "3900 KRW", R.drawable.ic_bottle_blue),
+//    PriceItemData("A Loaf of Bread", "1.20 USD", "1500 KRW", R.drawable.ic_bottle_blue)
+//)
 
 val sampleItems = listOf(
-    PriceItemData("A Bottle of Water", "0.54 USD", "800 KRW", R.drawable.ic_bottle_blue),
-    PriceItemData("A Cup of Coffee", "2.80 USD", "3900 KRW", R.drawable.ic_bottle_blue),
-    PriceItemData("A Loaf of Bread", "1.20 USD", "1500 KRW", R.drawable.ic_bottle_blue)
+    PriceItemData("A Bottle of Water", "0.54 USD", "800 KRW", "https://images.unsplash.com/photo-1604882406195-d94d4888567d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDkxODh8MHwxfHNlYXJjaHwxfHxSb2FzdGVkJTIwU2Vhd2VlZCUyMFNuYWNrJTIwJTI1MjhHaW0lMjUyOXxlbnwwfHx8fDE3NDcyNDkyNTh8MA&ixlib=rb-4.1.0&q=80&w=1080"),
+    PriceItemData("A Cup of Coffee", "2.80 USD", "3900 KRW", "https://images.unsplash.com/photo-1604882406195-d94d4888567d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDkxODh8MHwxfHNlYXJjaHwxfHxSb2FzdGVkJTIwU2Vhd2VlZCUyMFNuYWNrJTIwJTI1MjhHaW0lMjUyOXxlbnwwfHx8fDE3NDcyNDkyNTh8MA&ixlib=rb-4.1.0&q=80&w=1080"),
+    PriceItemData("A Loaf of Bread", "1.20 USD", "1500 KRW", "https://images.unsplash.com/photo-1604882406195-d94d4888567d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDkxODh8MHwxfHNlYXJjaHwxfHxSb2FzdGVkJTIwU2Vhd2VlZCUyMFNuYWNrJTIwJTI1MjhHaW0lMjUyOXxlbnwwfHx8fDE3NDcyNDkyNTh8MA&ixlib=rb-4.1.0&q=80&w=1080")
 )
 
 @Composable
@@ -43,22 +54,26 @@ fun PriceItem(item: PriceItemData) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = item.imageRes),
-                contentDescription = null,
+            AsyncImage(
+                model = item.image,
+                contentDescription = item.itemName,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(50.dp)
-                    .padding(end = 10.dp)
+                    .clip(CircleShape) // ✅ 원형 처리
+                    .background(Color.LightGray) // 원 안 배경 깔끔하게
             )
+
+            Spacer(modifier = Modifier.width(10.dp)) // ✅ 바깥 여백으로 처리
 
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(text = item.title, fontSize = 14.sp, color = Color.Black)
-                Text(text = item.tripPrice, fontSize = 12.sp, color = Color.Gray)
+                Text(text = item.itemName, fontSize = 14.sp, color = Color.Black)
+                Text(text = item.travelPrice, fontSize = 12.sp, color = Color.Gray)
             }
 
-            Text(text = item.mycityPrice, fontSize = 14.sp, color = Color.Black)
+            Text(text = item.userPrice, fontSize = 14.sp, color = Color.Black)
         }
     }
 }

@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    // Hilt
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -44,6 +48,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,4 +75,12 @@ dependencies {
 
     // 뷰모델 사용
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    // coil 의존성 추가
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    // Hilt
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation)
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 }

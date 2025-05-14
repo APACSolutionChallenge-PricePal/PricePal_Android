@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    // Hilt
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -48,7 +52,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.compose.jvmstubs)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,4 +64,18 @@ dependencies {
 
     // 뷰모델
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    // coil 의존성 추가
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
+    // Hilt
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation)
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    // 의존성 정의
+    implementation(project(":core"))
+    implementation(project(":design"))
+    //implementation(project(":data"))
 }
