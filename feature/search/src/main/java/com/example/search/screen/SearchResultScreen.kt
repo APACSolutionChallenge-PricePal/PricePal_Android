@@ -41,7 +41,7 @@ import com.example.search.SearchViewModel
 fun SearchResultScreen(viewModel: SearchViewModel = viewModel()) {
     val scrollState = rememberScrollState()
 //    val searchKeyword = "Paddington Bear" // 예시로 고정된 키워드
-    val searchKeyword = viewModel.searchQuery.value // 🔄 ViewModel 값 사용
+    val searchKeyword = viewModel.searchQuery.value
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
