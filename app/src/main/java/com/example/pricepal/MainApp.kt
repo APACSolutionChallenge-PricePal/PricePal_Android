@@ -20,6 +20,7 @@ import com.example.pricepal.component.NavigationBar
 import com.example.pricepal.component.NavigationItem
 import com.example.pricepal.SplashScreen
 import com.example.start.StartViewModel
+import com.example.taxi.TaxiApp
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
 
@@ -144,8 +145,7 @@ fun MainApp(viewModel: MainViewModel) {
                     LaunchedEffect(Unit) { showNavBar = true }
                     FinishHandler()
 
-                    // 추가 개발 필요
-                    //TaxiApp()
+                    TaxiApp()
                 }
             }
         }

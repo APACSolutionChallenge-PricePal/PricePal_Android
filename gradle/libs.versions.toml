@@ -20,6 +20,7 @@ runtimeAndroid = "1.8.0"
 navigationCompose = "2.8.9"
 kotlinxCoroutines = "1.10.1"
 gson = "2.10.1"
+maps_compose = "2.11.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -53,6 +54,10 @@ retrofit2-converter-gson = { group = "com.squareup.retrofit2", name = "converter
 preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "sharedPreference" }
 
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "maps_compose" }
+maps-compose-utils = { group = "com.google.maps.android", name = "maps-compose-utils", version.ref = "maps_compose" }
+maps-compose-widgets = { group = "com.google.maps.android", name = "maps-compose-widgets", version.ref = "maps_compose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
