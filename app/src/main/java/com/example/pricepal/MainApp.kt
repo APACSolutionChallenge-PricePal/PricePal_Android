@@ -1,17 +1,22 @@
 package com.example.pricepal
 
 import android.app.Activity
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Modifier
+import com.example.core.MainViewModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.core.model.Country
 import com.example.home.HomeApp
 import com.example.home.HomeViewModel
@@ -23,6 +28,7 @@ import com.example.start.StartViewModel
 import com.example.taxi.TaxiApp
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
+import com.example.pricepal.NavigationDestination
 
 @Composable
 fun MainApp(viewModel: MainViewModel) {
@@ -93,44 +99,36 @@ fun MainApp(viewModel: MainViewModel) {
             with(NavigationDestination.Start) {
                 setNavGraph {
                     val startViewModel: StartViewModel = hiltViewModel()
-                    LaunchedEffect(Unit) {
-                        startViewModel.loadCountries()
-                    }
-                    FinishHandler()
-
                     StartApp(
-                        startViewModel
+                        viewModel = startViewModel,
+                        mainViewModel = viewModel, // <- MainViewModel
+                        onNavigateHome = {
+                            navController.navigate("home")
+                        }
                     )
                 }
             }
 
-            with(NavigationDestination.Home) {
-                setNavGraph {
-                    val homeViewModel: HomeViewModel = hiltViewModel()
-                    val gson = remember { Gson() }
 
-                    val ownCountryJson = it.arguments?.getString("ownCountry") ?: ""
-                    val travelCountryJson = it.arguments?.getString("travelCountry") ?: ""
+            composable("home") {
+                val ownCountry = viewModel.ownCountry.value
+                val travelCountry = viewModel.travelCountry.value
+                val homeViewModel: HomeViewModel = hiltViewModel()
 
-                    val ownCountry = remember { gson.fromJson(ownCountryJson, Country::class.java) }
-                    val travelCountry = remember { gson.fromJson(travelCountryJson, Country::class.java) }
-
-                    FinishHandler()
-
+                if (ownCountry != null && travelCountry != null) {
                     Column {
-                        Spacer(
-                            modifier = Modifier.height(
-                                WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
-                            )
-                        )
-                        HomeApp(
-                            viewModel = homeViewModel,
-                            ownCountry = ownCountry,
-                            travelCountry = travelCountry
-                        )
+                        Spacer(modifier = Modifier.height(WindowInsets.systemBars.asPaddingValues().calculateTopPadding()))
+                        HomeApp(viewModel = homeViewModel, ownCountry = ownCountry, travelCountry = travelCountry)
+                    }
+                } else {
+                    LaunchedEffect(Unit) {
+                        navController.navigate("start") {
+                            popUpTo(0)
+                        }
                     }
                 }
             }
+
 
 
             with(NavigationDestination.Search) {

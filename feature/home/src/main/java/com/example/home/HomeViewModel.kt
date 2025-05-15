@@ -48,8 +48,8 @@ class HomeViewModel @Inject constructor(
 
                 // 임시 더미 데이터로 앱이 멈추지 않게 유지
                 _countryDetail.value = CountryDetail(
-                    countryName = "Korea",
-                    imageUrl = "https://opendata.mofa.go.kr:8444/fileDownload/images/country_images/flags/241/20220224_233513043.gif"
+                    countryName = "NO Flag",
+                    imageUrl = "https://upload.wikimedia.org/wikipedia/commons/7/75/Flag_of_None_%28square%29.svg"
                 )
             }
         }

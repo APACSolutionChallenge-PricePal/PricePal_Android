@@ -78,7 +78,6 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .systemBarsPadding()
             .padding(horizontal = 25.dp, vertical = 8.dp)
     ) {
         item {
@@ -153,7 +152,7 @@ fun HeaderSection(
                 .fillMaxWidth()
                 .padding(horizontal = 11.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             if (countryDetail != null) {
                 coil3.compose.AsyncImage(
