@@ -1,10 +1,30 @@
 # PricePal Android
-This is the Android repository for the "PricePal" project.
+> This is the Android repository for the "PricePal" project.
+
+ #### PricePal 🌍 is a travel price guide app for travelers abroad.
+ 
+ #### It offers currency conversion, local price comparisons, and taxi fare predictions.
 
 <br/>
-
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/24e540a3-9f1c-402c-9723-6628152484aa" width="400" height="400">
+<img src="https://github.com/user-attachments/assets/67e8a028-136c-4dea-96c2-a3bd6377595a">
+</p>
+
+## 🌏 PricePal
+
+Want to avoid getting ripped off while traveling abroad?  
+PricePal is your travel price guide app that helps you check local prices at a glance, convert currencies, and estimate taxi fares.
+
+- ✅ Real-time exchange rates by country
+- 🛒 Local price comparison list
+- 🚖 Taxi fare estimation based on departure and destination
+- 📍 Route visualization using Google Maps
+
+> Built with Android (Jetpack Compose) + Spring Boot REST API
+
+## PricePal Logo
+<p>
+  <img src="https://github.com/user-attachments/assets/24e540a3-9f1c-402c-9723-6628152484aa" width="200" height="200">
 </p>
 <br/>
 
