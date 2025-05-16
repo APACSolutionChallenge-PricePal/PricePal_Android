@@ -1,6 +1,5 @@
 package com.example.search.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -22,19 +21,13 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.search.R
 import com.example.search.model.PriceItemData
+import com.example.search.screen.highlight
 
-//data class PriceItemData(
-//    val title: String,
-//    val mycityPrice: String,
-//    val tripPrice: String,
-//    val imageRes: Int
-//)
-//
-//val sampleItems = listOf(
-//    PriceItemData("A Bottle of Water", "0.54 USD", "800 KRW", R.drawable.ic_bottle_blue),
-//    PriceItemData("A Cup of Coffee", "2.80 USD", "3900 KRW", R.drawable.ic_bottle_blue),
-//    PriceItemData("A Loaf of Bread", "1.20 USD", "1500 KRW", R.drawable.ic_bottle_blue)
-//)
+val mainText = Color(0xFF4B4B4B)
+val highlight = Color(0xFF00611A)
+val gray = Color(0xFF838383)
+val white = Color(0xFFFFFFFF)
+
 
 val sampleItems = listOf(
     PriceItemData("A Bottle of Water", "0.54 USD", "800 KRW", "https://images.unsplash.com/photo-1604882406195-d94d4888567d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDkxODh8MHwxfHNlYXJjaHwxfHxSb2FzdGVkJTIwU2Vhd2VlZCUyMFNuYWNrJTIwJTI1MjhHaW0lMjUyOXxlbnwwfHx8fDE3NDcyNDkyNTh8MA&ixlib=rb-4.1.0&q=80&w=1080"),
@@ -47,9 +40,9 @@ fun PriceItem(item: PriceItemData) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, Color(0xFF2E6517), RoundedCornerShape(25.dp))
-            .background(Color.White, RoundedCornerShape(25.dp))
-            .padding(12.dp)
+            .border(1.dp, highlight, RoundedCornerShape(25.dp))
+            .background(white, RoundedCornerShape(25.dp))
+            .padding(horizontal = 22.dp, vertical = 17.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -59,21 +52,44 @@ fun PriceItem(item: PriceItemData) {
                 contentDescription = item.itemName,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(50.dp)
+                    .size(75.dp)
                     .clip(CircleShape) // ✅ 원형 처리
                     .background(Color.LightGray) // 원 안 배경 깔끔하게
             )
 
-            Spacer(modifier = Modifier.width(10.dp)) // ✅ 바깥 여백으로 처리
+            Spacer(modifier = Modifier.width(16.dp)) // ✅ 바깥 여백으로 처리
 
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(text = item.itemName, fontSize = 14.sp, color = Color.Black)
-                Text(text = item.travelPrice, fontSize = 12.sp, color = Color.Gray)
-            }
+                Column {
+                    Text(
+                        text = item.itemName,
+                        fontSize = 20.sp,
+                        color = mainText
+                    )
 
-            Text(text = item.userPrice, fontSize = 14.sp, color = Color.Black)
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = item.travelPrice,
+                        fontSize = 16.sp,
+                        color = gray
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(1.dp))
+
+                Text(
+                    text = item.userPrice,
+                    fontSize = 18.sp,
+                    color = mainText,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.End)
+                        .padding(end = 3.dp, bottom = 2.dp)
+                )
+            }
         }
     }
 }

@@ -25,6 +25,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PricePal">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
         <!-- 메인 액티비티 -->
         <activity
             android:name=".MainActivity"

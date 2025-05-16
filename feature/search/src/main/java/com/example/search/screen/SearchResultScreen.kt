@@ -41,6 +41,7 @@ import coil3.compose.AsyncImage
 import com.example.search.R
 import com.example.search.SearchViewModel
 import androidx.compose.runtime.LaunchedEffect
+import com.example.search.components.gray
 
 @Composable
 fun SearchResultScreen(viewModel: SearchViewModel) {
@@ -63,7 +64,7 @@ fun SearchResultScreen(viewModel: SearchViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFCFAF4))
+            .background(backgroundColor)
             .padding(bottom = 20.dp)
             .verticalScroll(scrollState)
     ) {
@@ -72,31 +73,31 @@ fun SearchResultScreen(viewModel: SearchViewModel) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 30.dp, start = 16.dp, end = 36.dp)
+                .padding(top = 59.dp, start = 38.dp, end = 39.dp)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(20.dp)
                     .clickable { backDispatcher?.onBackPressed() }
             )
 
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(20.dp))
 
             Box(
                 contentAlignment = Alignment.CenterStart,
                 modifier = Modifier
                     .weight(1f)
                     .height(44.dp)
-                    .border(2.dp, Color(0xFF00611A), RoundedCornerShape(20.dp))
-                    .background(Color(0xFFFFFFFF), RoundedCornerShape(20.dp))
-                    .padding(horizontal = 24.dp)
+                    .border(2.dp, highlight, RoundedCornerShape(20.dp))
+                    .background(white, RoundedCornerShape(20.dp))
+                    .padding(horizontal = 24.dp, vertical = 13.dp)
             ) {
                 Text(
                     text = searchKeyword,
                     fontSize = 15.sp,
-                    color = Color.Black
+                    color = mainText
                 )
             }
         }
@@ -120,15 +121,16 @@ fun SearchResultScreen(viewModel: SearchViewModel) {
             Text(
                 text = it.content,
                 modifier = Modifier.padding(horizontal = 26.dp),
-                fontSize = 16.sp,
-                color = Color(0xFF4B4B4B)
+                fontSize = 20.sp,
+                color = mainText,
+                lineHeight = 23.sp
             )
         } ?: run {
             Text(
                 text = "Loading guide...",
                 modifier = Modifier.padding(horizontal = 26.dp),
-                fontSize = 16.sp,
-                color = Color.Gray
+                fontSize = 20.sp,
+                color = gray
             )
         }
     }

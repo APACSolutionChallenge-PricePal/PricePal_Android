@@ -2,6 +2,7 @@ package com.example.pricepal.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,24 +25,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
+import com.example.home.mainColor
 import com.example.pricepal.R
+import com.example.search.screen.mainText
 
 enum class NavigationItem(
+    val route: String,
     @DrawableRes val icon: Int,
     val size: Size,
     val magnification: Float,
 ) {
     SEARCH(
+        route = "search",
         icon = R.drawable.ic_search,
         size = Size(25f, 25f),
         magnification = 1f,
     ),
     HOME(
+        route = "home",
         icon = R.drawable.ic_home,
         size = Size(25f, 25f),
         magnification = 1f,
     ),
     MAP(
+        route = "taxi",
         icon = R.drawable.ic_map,
         size = Size(25f, 25f),
         magnification = 1f,
@@ -61,8 +68,6 @@ fun NavigationBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = Color.White)
-            .clip(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .shadow(
                 elevation = 4.dp, // Blur 값에 대응
                 spotColor = Color(0x80CACACA), // 50% 투명도 (#CA = 202, 0x80 = 50%)
@@ -70,6 +75,9 @@ fun NavigationBar(
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
                 clip = false // 그림자가 바깥에 생기도록
             )
+            .background(color = Color.White)
+            .clip(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            .border(0.5.dp, mainText, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
     ) {
         Row(
             modifier = Modifier

@@ -1,7 +1,12 @@
 package com.example.taxi
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,13 +21,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuDefaults.textFieldColors
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,21 +38,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.Marker
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.maps.android.compose.MarkerState
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.location.LocationServices
+import com.google.android.libraries.places.widget.Autocomplete
 import com.google.maps.android.compose.MapProperties
-import java.util.Locale
-import java.util.jar.Manifest
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.google.android.libraries.places.api.model.Place
+import com.google.maps.android.compose.Polyline
+
 
 val backgroundColor = Color(0xFFFCFAF4)
 val mainColor = Color(0xFF4CAE5E)
@@ -61,17 +66,41 @@ val highlight = Color(0xFF00611A)
 
 @SuppressLint("MissingPermission")
 @Composable
-fun TaxiScreen() {
-    //val config = LocalContext.current.resources.configuration
-    //config.setLocale(Locale.ENGLISH)
-    //val seoul = LatLng(37.5665, 126.9780)
-    //val cameraPositionState = rememberCameraPositionState()
-    //cameraPositionState.position = CameraPosition.fromLatLngZoom(seoul, 12f)
-
+fun TaxiScreen(viewModel: TaxiViewModel) {
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     val cameraPositionState = rememberCameraPositionState()
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
+
+    // 상태 저장
+    var startLatLng by remember { mutableStateOf<LatLng?>(null) }
+    var endLatLng by remember { mutableStateOf<LatLng?>(null) }
+    var isSelectingStart by remember { mutableStateOf(true) }
+    var startText by remember { mutableStateOf("") }
+    var endText by remember { mutableStateOf("") }
+
+    // 1️⃣ Autocomplete Intent Launcher
+    val autocompleteLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK) {
+                val place = Autocomplete.getPlaceFromIntent(result.data!!)
+                val latLng = place.latLng
+                val name = place.name
+
+                latLng?.let {
+                    if (isSelectingStart) {
+                        startLatLng = it
+                        startText = name ?: ""
+                    } else {
+                        endLatLng = it
+                        endText = name ?: ""
+                    }
+                    cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 15f)
+                }
+            }
+        }
+    )
 
     // 위치 권한 요청 런처
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -89,7 +118,14 @@ fun TaxiScreen() {
         }
     )
 
-    // 위치 권한 요청 트리거
+    val polylinePoints by viewModel.polylinePoints.collectAsState()
+    val distanceMeters by viewModel.distanceMeters.collectAsState()
+    val durationSeconds by viewModel.durationSeconds.collectAsState()
+
+    val taxiFare by viewModel.taxiFare.collectAsState()
+    var showFareCard by remember { mutableStateOf(false) }
+
+
     LaunchedEffect(Unit) {
         locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
     }
@@ -109,100 +145,142 @@ fun TaxiScreen() {
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // 🗺 Google Map 배경
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(
-                isMyLocationEnabled = currentLocation != null // 파란 점 표시
-            )
+            properties = MapProperties(isMyLocationEnabled = currentLocation != null)
         ) {
             currentLocation?.let {
-                Marker(
-                    state = MarkerState(position = it),
-                    title = "현재 위치"
-                )
+                Marker(state = MarkerState(position = it), title = "Current Location")
+            }
+            startLatLng?.let {
+                Marker(state = MarkerState(position = it), title = "Start")
+            }
+            endLatLng?.let {
+                Marker(state = MarkerState(position = it), title = "Destination")
+            }
+            // ✅ Polyline 표시
+            Log.d("ROUTE", "Polyline: $polylinePoints")
+            if (polylinePoints.isNotEmpty()) {
+                Polyline(points = polylinePoints, color = Color.Blue, width = 8f)
             }
         }
-
-        // 🔍 입력창 Overlay
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 40.dp)
-                .shadow(
-                    elevation = 11.dp,
-                    shape = RoundedCornerShape(20.dp),
-                    ambientColor = mainColor,
-                    spotColor = mainColor
-                )
-                .background(Color.White.copy(alpha = 0.80f), RoundedCornerShape(20.dp))
-                .padding(15.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .drawWithContent {
-                        drawContent()
-                        drawLine(
-                            color = highlight,
-                            start = androidx.compose.ui.geometry.Offset(0f, size.height / 2),
-                            end = androidx.compose.ui.geometry.Offset(size.width, size.height / 2),
-                            strokeWidth = 1.dp.toPx(),
-                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 6f))
-                        )
-                    }
-            ) {
-                TransparentSearchInput("Please enter your departure location.")
-                Spacer(modifier = Modifier.height(22.dp))
-                TransparentSearchInput("Please enter your destination.")
-            }
-
-            Spacer(modifier = Modifier.width(18.dp))
-
-            Image(
-                painter = painterResource(id = R.drawable.ic_search_green),
-                contentDescription = "Search Icon",
-                modifier = Modifier
-                    .size(28.dp)
-                    .align(Alignment.CenterVertically)
-            )
-        }
-
-
-
-    }
-}
-@Composable
-fun TransparentSearchInput(hint: String) {
-    var input by remember { mutableStateOf("") }
-
-    BasicTextField(
-        value = input,
-        onValueChange = { input = it },
-        singleLine = true,
-        maxLines = 1,
-        decorationBox = { innerTextField ->
-            Box(
+        Column(){
+            // 🔍 검색 입력창
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 40.dp)
+                    .shadow(11.dp, RoundedCornerShape(20.dp), ambientColor = mainColor, spotColor = mainColor)
+                    .background(Color.White.copy(alpha = 0.80f), RoundedCornerShape(20.dp))
+                    .padding(15.dp)
             ) {
-                if (input.isEmpty()) {
-                    Text(
-                        text = hint,
-                        color = Color(0xFF4B4B4B),
-                        fontSize = 15.sp,
-                        maxLines = 1
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    ClickableSearchField(
+                        text = startText.ifEmpty { "Please enter your departure location." }) {
+                        isSelectingStart = true
+                        launchAutocomplete(context, autocompleteLauncher)
+                    }
+                    Spacer(modifier = Modifier.height(11.dp))
+                    // ✅ 선 추가 (중간에 점선)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .drawWithContent {
+                                val dashEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 6f))
+                                drawLine(
+                                    color = highlight,
+                                    start = Offset(0f, 0f),
+                                    end = Offset(size.width, 0f),
+                                    strokeWidth = 1.dp.toPx(),
+                                    pathEffect = dashEffect
+                                )
+                            }
                     )
+                    Spacer(modifier = Modifier.height(11.dp))
+                    ClickableSearchField(text = endText.ifEmpty { "Please enter your destination." }) {
+                        isSelectingStart = false
+                        launchAutocomplete(context, autocompleteLauncher)
+                    }
                 }
-                innerTextField()
+
+                val country by viewModel.countryCode.collectAsState()
+
+                // 검색 이미지
+                Spacer(modifier = Modifier.width(18.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.ic_search_green),
+                    contentDescription = "Search Icon",
+                    modifier = Modifier
+                        .size(28.dp)
+                        .align(Alignment.CenterVertically)
+                        .clickable {
+                            if (startLatLng != null && endLatLng != null && currentLocation != null) {
+                                viewModel.setCountryFromLocation(context, currentLocation!!)
+                                country?.let {
+                                    viewModel.loadRouteAndFare(startLatLng!!, endLatLng!!, it)
+                                    showFareCard = true
+                                }
+                            }
+                            Log.d("DEBUG", "Search Clicked: start=$startLatLng, end=$endLatLng, current=$currentLocation, country=$country")
+
+                        }
+                )
             }
         }
-    )
+        if (showFareCard && taxiFare != null) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                    .padding(24.dp)
+            ) {
+                Column(horizontalAlignment = Alignment.Start) {
+                    Text("🚕 The Basic Taxi Fares", fontSize = 18.sp, color = titleBlack)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Basic Fare: ${taxiFare!!.basicFare}", fontSize = 16.sp)
+                    Text("Distance: ${taxiFare!!.distance} km", fontSize = 16.sp)
+                    Text("Estimated Fare: ${taxiFare!!.estimatedFare}", fontSize = 16.sp)
+                }
+            }
+        }
+    }
 }
 
-@Preview(showBackground = true)
+// ✨ 클릭 가능한 검색창 Composable
 @Composable
-fun PreviewTaxiScreen() {
-    TaxiScreen()
+fun ClickableSearchField(text: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)
+            .padding(vertical = 4.dp)
+            .clickable { onClick() }
+    ) {
+        Text(
+            text = text,
+            fontSize = 15.sp,
+            color = if (text.startsWith("Please")) Color(0xFF4B4B4B) else Color.Black
+        )
+    }
 }
+
+// ✨ Autocomplete Intent 실행 함수
+fun launchAutocomplete(context: Context, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+    val fields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
+    val intent = Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
+        .build(context)
+    launcher.launch(intent)
+}
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewTaxiScreen() {
+//    TaxiScreen()
+//}
