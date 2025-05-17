@@ -2,6 +2,8 @@ package com.example.data.di.api
 
 import com.example.data.api.ServerApi
 import com.squareup.moshi.Moshi
+import com.example.data.BuildConfig
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,9 +20,8 @@ object ServerApiModule {
 
     @Provides
     @Singleton
-    fun provideServerApi(
-        moshi: Moshi
-    ): ServerApi {
+    fun provideServerApi(): ServerApi {
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val logger = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -30,10 +31,11 @@ object ServerApiModule {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVER_BASE_URL) // TODO: 실제 서버 주소
+            .baseUrl(BuildConfig.SERVER_BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()
             .create(ServerApi::class.java)
     }
+
 }

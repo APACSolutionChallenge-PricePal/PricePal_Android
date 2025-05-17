@@ -1,6 +1,6 @@
 [versions]
 agp = "8.9.1"
-kotlin = "2.1.20"
+kotlin = "2.0.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -10,15 +10,20 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 hilt = "2.51.1"
 androidx-hilt = "1.2.0"
-ksp = "2.1.20-2.0.1"
+ksp = "2.0.0-1.0.21"
 appcompat = "1.7.0"
 material = "1.12.0"
-jetbrainsKotlinJvm = "2.1.20"
+jetbrainsKotlinJvm = "2.0.0"
 retrofit2 = "2.11.0"
 sharedPreference = "1.2.1"
 runtimeAndroid = "1.8.0"
 navigationCompose = "2.8.9"
+navigationComposeJvmstubs = "2.9.0"
 kotlinxCoroutines = "1.10.1"
+gson = "2.10.1"
+maps_compose = "2.11.4"
+places = "4.2.0"
+playServicesMaps = "19.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,11 +50,20 @@ androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime
 
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version = "0.32.0" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-compose-jvmstubs = { group = "androidx.navigation", name = "navigation-compose-jvmstubs", version.ref = "navigationComposeJvmstubs" }
 
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2" }
 retrofit2-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit2" }
 preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "sharedPreference" }
+
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "maps_compose" }
+maps-compose-utils = { group = "com.google.maps.android", name = "maps-compose-utils", version.ref = "maps_compose" }
+maps-compose-widgets = { group = "com.google.maps.android", name = "maps-compose-widgets", version.ref = "maps_compose" }
+places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

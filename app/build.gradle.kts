@@ -20,6 +20,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["MAPS_API_KEY"] = project.findProperty("MAPS_API_KEY") as String? ?: ""
+        buildConfigField("String", "MAPS_API_KEY", "\"${project.findProperty("MAPS_API_KEY")}\"")
     }
 
     buildTypes {
@@ -54,6 +56,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.places)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,6 +64,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(libs.gson)
+
+
+    // ✅ 시스템 바 투명 제어 (Splash용)
+    implementation(libs.accompanist.systemuicontroller)
 
     //의존성 정의
     implementation(project(":feature:start"))
@@ -70,8 +79,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":data"))
     implementation(project(":design"))
-
-    implementation(project(":test:start"))
 
     // Hilt
     implementation(libs.hilt.android)

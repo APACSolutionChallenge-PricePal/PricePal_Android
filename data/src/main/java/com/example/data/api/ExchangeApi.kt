@@ -9,8 +9,8 @@ import retrofit2.http.Query
 
 interface ExchangeApi {
 
-    @POST("/exchange/rate")
+    @POST("/exchange")
     suspend fun getExchangeRate(
         @Body request: ExchangeRequestDTO
-    ): BaseResponse<Double>
+    ): BaseResponse<String>
 }

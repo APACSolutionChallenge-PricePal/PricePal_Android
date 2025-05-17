@@ -25,7 +25,8 @@ android {
         consumerProguardFiles("consumer-rules.pro")
 
         listOf(
-            "SERVER_BASE_URL"
+            "SERVER_BASE_URL",
+            "MAPS_API_KEY"
         ).forEach {
             buildConfigField("String", it, "\"${localProperties.getProperty(it)}\"")
         }
@@ -47,6 +48,10 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -55,6 +60,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)
     implementation(libs.material)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
@@ -70,6 +76,9 @@ dependencies {
     ksp(libs.hilt.compiler)
     ksp(libs.androidx.hilt.complier)
     implementation(libs.androidx.hilt.navigation)
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.2")
+
 
     // Retrofit2
     implementation(libs.retrofit2)
@@ -80,4 +89,7 @@ dependencies {
 
     // SharedPreference
     implementation(libs.preference.ktx)
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.maps.android:android-maps-utils:2.3.0")
+
 }

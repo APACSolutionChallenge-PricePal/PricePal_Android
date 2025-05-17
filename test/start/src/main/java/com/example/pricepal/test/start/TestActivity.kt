@@ -6,28 +6,30 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.*
 import androidx.core.view.WindowCompat
+import androidx.navigation.compose.rememberNavController
 import com.example.start.SplashScreen
 import com.example.start.StartApp
 import com.example.start.StartViewModel
+import com.example.start.navigation.StartNavHost
 import dagger.hilt.android.AndroidEntryPoint
 
-//@AndroidEntryPoint
+@AndroidEntryPoint
 class TestActivity : ComponentActivity() {
 
-    private val viewModel by viewModels<StartViewModel>()
+    private val viewModel: StartViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            var showSplash by remember { mutableStateOf(true) }
+            val navController = rememberNavController()
 
-            if (showSplash) {
-                SplashScreen(onTimeout = { showSplash = false })
-            } else {
-                StartApp(viewModel = viewModel)
-            }
+            StartNavHost(
+                navController = navController,
+                viewModel = viewModel
+            )
         }
     }
 }

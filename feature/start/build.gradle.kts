@@ -50,6 +50,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.gson)
 
     // ✅ Compose BOM (버전 통일 관리)
     implementation(platform(libs.androidx.compose.bom))
@@ -65,13 +66,20 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
     // coil 의존성 추가
     implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    implementation("io.coil-kt.coil3:coil-svg:3.0.4")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation("io.coil-kt.coil3:coil-gif:3.0.4")
+
     // Hilt
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation)
 
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
     // 의존성 정의
     implementation(project(":core"))
     implementation(project(":design"))
-    //implementation(project(":data"))
+    implementation(project(":data"))
+    implementation(project(":feature:home"))
 }
