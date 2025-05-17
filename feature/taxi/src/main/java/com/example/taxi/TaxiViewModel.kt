@@ -11,9 +11,11 @@ import com.example.core.repository.TaxiFareRepository
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 import javax.inject.Inject
 
@@ -56,11 +58,16 @@ class TaxiViewModel @Inject constructor(
     val countryCode: StateFlow<String?> = _countryCode
 
     fun setCountryFromLocation(context: Context, latLng: LatLng) {
-        val geocoder = Geocoder(context, Locale.ENGLISH) // ← 이 부분 고정!
-        val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-        val country = addresses?.firstOrNull()?.countryName?.lowercase(Locale.ENGLISH)
-        _countryCode.value = country
+        viewModelScope.launch {
+            val country = withContext(Dispatchers.IO) {
+                val geocoder = Geocoder(context, Locale.ENGLISH)
+                val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                addresses?.firstOrNull()?.countryName?.lowercase(Locale.ENGLISH)
+            }
+            _countryCode.value = country
+        }
     }
+
 
 
     fun loadRoute(start: LatLng, end: LatLng) {

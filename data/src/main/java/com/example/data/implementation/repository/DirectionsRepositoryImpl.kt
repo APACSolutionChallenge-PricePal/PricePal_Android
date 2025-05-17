@@ -6,6 +6,7 @@ import com.example.core.repository.DirectionsResult
 import com.example.data.BuildConfig
 import com.example.data.api.DirectionsApi
 import com.example.data.api.dto.server.DirectionsResponse
+import com.example.data.util.PolylineUtils.decodePolyline
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import javax.inject.Inject
@@ -21,15 +22,21 @@ class DirectionsRepositoryImpl @Inject constructor(
             origin = origin,
             destination = destination,
             apiKey = BuildConfig.MAPS_API_KEY
+
         )
+        Log.d("DIRECTIONS", "📌 API 호출: origin=$origin, destination=$destination")
+        Log.d("DIRECTIONS", "✅ 응답 성공 여부: ${response.isSuccessful}")
+
 
         if (response.isSuccessful) {
             val body = response.body()
-            Log.d("DIRECTIONS_API", "response body: ${body}")
-            Log.d("DIRECTIONS_API", "status: ${body?.routes}, routes: ${body?.routes?.size}")
+            Log.d("DIRECTIONS", "📦 Body: $body")
+            Log.d("DIRECTIONS", "📈 Status: ${body?.status}, Error: ${body?.errorMessage}")
+            Log.d("DIRECTIONS", "🛣️ Routes found: ${body?.routes?.size}")
             return body?.let { parseDirections(it) }
         } else {
-            Log.e("DIRECTIONS_API", "response error: ${response.errorBody()?.string()}")
+            Log.e("DIRECTIONS", "❌ API 오류: ${response.errorBody()?.string()}")
+            Log.d("DIRECTIONS_API", "Request: origin=$origin, destination=$destination, mode=driving")
         }
         return null
     }
@@ -40,7 +47,7 @@ class DirectionsRepositoryImpl @Inject constructor(
         val polyline = route.overviewPolyline.points
 
         return DirectionsResult(
-            polylinePoints = PolyUtil.decode(polyline),
+            polylinePoints = decodePolyline(polyline),
             distanceMeters = leg.distance.value,
             durationSeconds = leg.duration.value
         )

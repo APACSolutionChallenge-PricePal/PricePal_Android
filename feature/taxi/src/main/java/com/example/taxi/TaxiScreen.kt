@@ -52,11 +52,15 @@ import com.google.maps.android.compose.MapProperties
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.libraries.places.api.model.Place
 import com.google.maps.android.compose.Polyline
+import kotlinx.coroutines.launch
 
 
 val backgroundColor = Color(0xFFFCFAF4)
@@ -68,6 +72,7 @@ val highlight = Color(0xFF00611A)
 @Composable
 fun TaxiScreen(viewModel: TaxiViewModel) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     val cameraPositionState = rememberCameraPositionState()
     var currentLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -150,9 +155,6 @@ fun TaxiScreen(viewModel: TaxiViewModel) {
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = currentLocation != null)
         ) {
-            currentLocation?.let {
-                Marker(state = MarkerState(position = it), title = "Current Location")
-            }
             startLatLng?.let {
                 Marker(state = MarkerState(position = it), title = "Start")
             }
@@ -162,7 +164,7 @@ fun TaxiScreen(viewModel: TaxiViewModel) {
             // ✅ Polyline 표시
             Log.d("ROUTE", "Polyline: $polylinePoints")
             if (polylinePoints.isNotEmpty()) {
-                Polyline(points = polylinePoints, color = Color.Blue, width = 8f)
+                Polyline(points = polylinePoints, color = Color.Green, width = 8f)
             }
         }
         Column(){
@@ -210,6 +212,15 @@ fun TaxiScreen(viewModel: TaxiViewModel) {
 
                 val country by viewModel.countryCode.collectAsState()
 
+                LaunchedEffect(country) {
+                    if (country != null && startLatLng != null && endLatLng != null) {
+                        Log.d("DEBUG", "🚀 country 업데이트됨! → API 호출 시작")
+                        viewModel.loadRouteAndFare(startLatLng!!, endLatLng!!, country!!)
+                        showFareCard = true
+                    }
+                }
+
+
                 // 검색 이미지
                 Spacer(modifier = Modifier.width(18.dp))
                 Image(
@@ -221,13 +232,19 @@ fun TaxiScreen(viewModel: TaxiViewModel) {
                         .clickable {
                             if (startLatLng != null && endLatLng != null && currentLocation != null) {
                                 viewModel.setCountryFromLocation(context, currentLocation!!)
-                                country?.let {
-                                    viewModel.loadRouteAndFare(startLatLng!!, endLatLng!!, it)
-                                    showFareCard = true
+
+                                val bounds = LatLngBounds.builder()
+                                    .include(startLatLng!!)
+                                    .include(endLatLng!!)
+                                    .build()
+
+                                // 카메라 이동
+                                coroutineScope.launch {
+                                    cameraPositionState.animate(
+                                        update = CameraUpdateFactory.newLatLngBounds(bounds, 100)
+                                    )
                                 }
                             }
-                            Log.d("DEBUG", "Search Clicked: start=$startLatLng, end=$endLatLng, current=$currentLocation, country=$country")
-
                         }
                 )
             }

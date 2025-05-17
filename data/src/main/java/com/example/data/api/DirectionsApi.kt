@@ -10,7 +10,8 @@ interface DirectionsApi {
     suspend fun getDirections(
         @Query("origin") origin: String,
         @Query("destination") destination: String,
-        @Query("mode") mode: String = "driving",
+        @Query("mode") mode: String = "transit",
+        @Query("alternatives") alternatives: Boolean = true,
         @Query("key") apiKey: String
     ): Response<DirectionsResponse>
 }
