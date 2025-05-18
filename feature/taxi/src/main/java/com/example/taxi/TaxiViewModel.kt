@@ -37,27 +37,51 @@ class TaxiViewModel @Inject constructor(
     private val _taxiFare = MutableStateFlow<TaxiFare?>(null)
     val taxiFare: StateFlow<TaxiFare?> = _taxiFare
 
-    fun loadRouteAndFare(start: LatLng, end: LatLng, country: String) {
+    fun loadRouteAndFare(
+        start: LatLng,
+        end: LatLng,
+        country: String,
+        context: Context,
+        onFail: () -> Unit,
+        onSuccess: () -> Unit
+    ) {
         viewModelScope.launch {
             val response = directionsRepository.getRoute(start, end)
+
             _polylinePoints.value = response?.polylinePoints ?: emptyList()
             _distanceMeters.value = response?.distanceMeters ?: 0
             _durationSeconds.value = response?.durationSeconds ?: 0
 
             val distanceKm = _distanceMeters.value / 1000.0
 
-            val fareResult = TaxiFareRepository.getTaxiFare(distanceKm.toString(), country.lowercase())
-            _taxiFare.value = fareResult
-            Log.d("DEBUG", "Fare 요청 - country: $country, distance: $distanceKm")
+            // ✅ 거리 0일 경우 경고 후 중단
+            if (distanceKm == 0.0 || _polylinePoints.value.isEmpty()) {
+                Log.d("DEBUG", "🚫 유효한 경로 없음 → 요청 중단")
+                onFail()
+                return@launch
+            }
 
+            val fareResult = TaxiFareRepository.getTaxiFare(
+                distance = distanceKm.toString(),
+                country = country.lowercase()
+            )
+            _taxiFare.value = fareResult
+
+            Log.d("DEBUG", "Fare 요청 - country: $country, distance: $distanceKm")
+            onSuccess()
         }
     }
+
 
     // TaxiViewModel.kt
     private val _countryCode = MutableStateFlow<String?>(null)
     val countryCode: StateFlow<String?> = _countryCode
 
-    fun setCountryFromLocation(context: Context, latLng: LatLng) {
+    fun setCountryFromLocation(
+        context: Context,
+        latLng: LatLng,
+        onCountryResolved: (String?) -> Unit
+    ) {
         viewModelScope.launch {
             val country = withContext(Dispatchers.IO) {
                 val geocoder = Geocoder(context, Locale.ENGLISH)
@@ -65,8 +89,10 @@ class TaxiViewModel @Inject constructor(
                 addresses?.firstOrNull()?.countryName?.lowercase(Locale.ENGLISH)
             }
             _countryCode.value = country
+            onCountryResolved(country)
         }
     }
+
 
 
 
