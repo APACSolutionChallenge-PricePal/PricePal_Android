@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -58,6 +59,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.libraries.places.api.model.Place
 import com.google.maps.android.compose.Polyline
 import kotlinx.coroutines.launch
@@ -156,10 +158,18 @@ fun TaxiScreen(viewModel: TaxiViewModel) {
             properties = MapProperties(isMyLocationEnabled = currentLocation != null)
         ) {
             startLatLng?.let {
-                Marker(state = MarkerState(position = it), title = "Start")
+                Marker(
+                    state = MarkerState(position = it),
+                    title = "Start",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                )
             }
             endLatLng?.let {
-                Marker(state = MarkerState(position = it), title = "Destination")
+                Marker(
+                    state = MarkerState(position = it),
+                    title = "Destination",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                )
             }
             // ✅ Polyline 표시
             Log.d("ROUTE", "Polyline: $polylinePoints")
@@ -212,14 +222,13 @@ fun TaxiScreen(viewModel: TaxiViewModel) {
 
                 val country by viewModel.countryCode.collectAsState()
 
-                LaunchedEffect(country) {
-                    if (country != null && startLatLng != null && endLatLng != null) {
-                        Log.d("DEBUG", "🚀 country 업데이트됨! → API 호출 시작")
-                        viewModel.loadRouteAndFare(startLatLng!!, endLatLng!!, country!!)
-                        showFareCard = true
-                    }
-                }
-
+//                LaunchedEffect(startLatLng, endLatLng, country) {
+//                    if (startLatLng != null && endLatLng != null && country != null) {
+//                        Log.d("DEBUG", "🚀 위치 또는 국가 변경 감지 → API 호출 시작")
+//                        viewModel.loadRouteAndFare(startLatLng!!, endLatLng!!, country!!)
+//                        showFareCard = true
+//                    }
+//                }
 
                 // 검색 이미지
                 Spacer(modifier = Modifier.width(18.dp))
@@ -230,19 +239,39 @@ fun TaxiScreen(viewModel: TaxiViewModel) {
                         .size(28.dp)
                         .align(Alignment.CenterVertically)
                         .clickable {
-                            if (startLatLng != null && endLatLng != null && currentLocation != null) {
-                                viewModel.setCountryFromLocation(context, currentLocation!!)
+                            if (startLatLng != null && endLatLng != null) {
+                                // 1️⃣ 국가 설정 후 콜백에서 처리
+                                viewModel.setCountryFromLocation(context, startLatLng!!) { country ->
+                                    if (country != null) {
+                                        // 2️⃣ 카메라 이동
+                                        val bounds = LatLngBounds.builder()
+                                            .include(startLatLng!!)
+                                            .include(endLatLng!!)
+                                            .build()
 
-                                val bounds = LatLngBounds.builder()
-                                    .include(startLatLng!!)
-                                    .include(endLatLng!!)
-                                    .build()
+                                        coroutineScope.launch {
+                                            cameraPositionState.animate(
+                                                update = CameraUpdateFactory.newLatLngBounds(bounds, 100)
+                                            )
+                                        }
 
-                                // 카메라 이동
-                                coroutineScope.launch {
-                                    cameraPositionState.animate(
-                                        update = CameraUpdateFactory.newLatLngBounds(bounds, 100)
-                                    )
+                                        // 3️⃣ 택시 요금 API 호출
+                                        viewModel.loadRouteAndFare(
+                                            start = startLatLng!!,
+                                            end = endLatLng!!,
+                                            country = country,
+                                            context = context,
+                                            onFail = {
+                                                Toast.makeText(context, "유효한 경로를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+                                                showFareCard = false
+                                            },
+                                            onSuccess = {
+                                                showFareCard = true
+                                            }
+                                        )
+                                    } else {
+                                        Toast.makeText(context, "국가 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                             }
                         }
